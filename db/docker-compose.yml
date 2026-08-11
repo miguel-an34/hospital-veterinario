@@ -1,0 +1,14 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: vet_hospital_db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: vet_hospital
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: adminpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./init-db:/docker-entrypoint-initdb.d
+    restart: unless-stopped
