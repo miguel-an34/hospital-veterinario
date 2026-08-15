@@ -19,8 +19,39 @@ O banco de dados foi disponibilizado para execução local via contêiner Docker
 * **Porta:** 3306
 
 ### Como executar o projeto
-1. Certifique-se de ter o Docker Desktop instalado e rodando em sua máquina.
+1. Certifique-se de ter o Docker instalado e rodando em sua máquina.
 2. Clone este repositório.
 3. Na raiz do projeto, execute o comando:
    ```bash
-   docker-compose up -d
+   docker compose up -d
+   ```
+
+## Metodologia de Povoamento
+
+O banco foi povoado através de um script DML (`db/init-db/02-data.sql`), executado automaticamente pelo container na inicialização, logo após o `01-schema.sql`. O MySQL processa os arquivos de `docker-entrypoint-initdb.d/` em ordem alfabética na primeira vez que o volume é criado — por isso o script de dados foi nomeado com o prefixo `02-`, garantindo que rode depois do schema.
+
+Os dados foram gerados por um script em **Python**, utilizando a biblioteca **Faker** (locale `pt_BR`) para produzir nomes, CPFs, endereços e telefones plausíveis, com cidades limitadas a municípios de Pernambuco. A geração respeitou a ordem de dependência das chaves estrangeiras (Usuario → Telefone/Tutor/Funcionario → Veterinario → Animal → Tutor_Animal/Alergia/Internacao → Agendamento → Consulta → RegistroClinico/Exame) e incluiu validações de integridade referencial antes da exportação do script SQL final.
+
+O volume gerado ultrapassa os mínimos exigidos em todas as tabelas:
+
+| Tabela | Linhas | Tipo |
+|---|---|---|
+| Usuario | 50 | Principal (mín. 50) |
+| Animal | 50 | Principal (mín. 50) |
+| Agendamento | 60 | Principal (mín. 50) |
+| Consulta | 55 | Principal (mín. 50) |
+| Telefone | 73 | Secundária (mín. 15) |
+| Tutor | 24 | Secundária (mín. 15) |
+| Funcionario | 26 | Secundária (mín. 15) |
+| Veterinario | 16 | Secundária (mín. 15) |
+| Tutor_Animal | 62 | Secundária (mín. 15) |
+| Alergia | 20 | Secundária (mín. 15) |
+| Internacao | 20 | Secundária (mín. 15) |
+| RegistroClinico | 30 | Secundária (mín. 15) |
+| Exame | 30 | Secundária (mín. 15) |
+
+Para validar o povoamento em um ambiente limpo (removendo o volume existente e recriando o banco do zero):
+```bash
+docker compose down -v
+docker compose up -d
+```
