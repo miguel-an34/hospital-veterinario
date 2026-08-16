@@ -40,6 +40,8 @@ O volume gerado ultrapassa os mínimos exigidos em todas as tabelas:
 | Animal | 50 | Principal (mín. 50) |
 | Agendamento | 60 | Principal (mín. 50) |
 | Consulta | 55 | Principal (mín. 50) |
+| RegistroClinico | 50 | Principal (mín. 50) |
+| Exame | 50 | Principal (mín. 50) |
 | Telefone | 73 | Secundária (mín. 15) |
 | Tutor | 24 | Secundária (mín. 15) |
 | Funcionario | 26 | Secundária (mín. 15) |
@@ -47,8 +49,6 @@ O volume gerado ultrapassa os mínimos exigidos em todas as tabelas:
 | Tutor_Animal | 62 | Secundária (mín. 15) |
 | Alergia | 20 | Secundária (mín. 15) |
 | Internacao | 20 | Secundária (mín. 15) |
-| RegistroClinico | 30 | Secundária (mín. 15) |
-| Exame | 30 | Secundária (mín. 15) |
 
 Para validar o povoamento em um ambiente limpo (removendo o volume existente e recriando o banco do zero):
 ```bash
