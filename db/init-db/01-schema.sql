@@ -87,7 +87,7 @@ CREATE TABLE Consulta (
     veterinario_cpf VARCHAR(11) NOT NULL,
     agendamento_id INT UNIQUE NULL,
     FOREIGN KEY (animal_id) REFERENCES Animal(id_animal) ON DELETE CASCADE,
-    FOREIGN KEY (veterinario_cpf) REFERENCES Veterinario(cpf) ON DELETE CASCADE,
+    FOREIGN KEY (veterinario_cpf) REFERENCES Veterinario(cpf) ON DELETE RESTRICT,
     FOREIGN KEY (agendamento_id) REFERENCES Agendamento(id_agendamento) ON DELETE SET NULL
 );
 
