@@ -1,0 +1,13 @@
+name: vetcare-frontend
+
+services:
+  frontend:
+    build:
+      context: .
+      args:
+        VITE_API_URL: http://localhost:8080
+        VITE_USE_MOCK_API: "false"
+    container_name: vet_hospital_frontend
+    ports:
+      - "5173:80"
+    restart: unless-stopped
