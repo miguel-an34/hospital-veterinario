@@ -1,6 +1,6 @@
-import type { TutorSummary } from '../types/Tutor'
+import type { Tutor, TutorInput, TutorSummary } from '../types/Tutor'
+import { apiRequest } from './apiClient'
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080'
 const USE_MOCK_API = import.meta.env.VITE_USE_MOCK_API === 'true'
 
 const tutoresMock: TutorSummary[] = [
@@ -12,18 +12,48 @@ const tutoresMock: TutorSummary[] = [
   { cpf: '89457361075', nome: 'João Ferreira', email: 'joao@example.com' },
 ]
 
+function mockCompleto(): Tutor[] {
+  return tutoresMock.map((tutor) => ({
+    ...tutor,
+    dataCadastro: '',
+    enderecoRua: 'Rua de exemplo',
+    enderecoNumero: '100',
+    enderecoBairro: 'Centro',
+    enderecoCidade: 'Recife',
+    enderecoCep: '50000000',
+    telefones: ['81999999999'],
+  }))
+}
+
 export const tutorService = {
   async listar(): Promise<TutorSummary[]> {
     if (USE_MOCK_API) return tutoresMock
+    return apiRequest<TutorSummary[]>('/tutores')
+  },
 
-    let response: Response
-    try {
-      response = await fetch(`${API_URL}/tutores`)
-    } catch {
-      throw new Error('Não foi possível carregar os tutores. Verifique se o backend está ativo.')
+  async listarCompleto(): Promise<Tutor[]> {
+    if (USE_MOCK_API) return mockCompleto()
+    const summaries = await apiRequest<TutorSummary[]>('/tutores')
+    return Promise.all(summaries.map(({ cpf }) => apiRequest<Tutor>(`/tutores/${cpf}`)))
+  },
+
+  buscarPorId(cpf: string): Promise<Tutor> {
+    if (USE_MOCK_API) {
+      const tutor = mockCompleto().find((item) => item.cpf === cpf)
+      return tutor ? Promise.resolve(tutor) : Promise.reject(new Error('Tutor não encontrado.'))
     }
+    return apiRequest<Tutor>(`/tutores/${cpf}`)
+  },
 
-    if (!response.ok) throw new Error('Não foi possível carregar os tutores.')
-    return response.json() as Promise<TutorSummary[]>
+  criar(input: TutorInput): Promise<Tutor> {
+    return apiRequest<Tutor>('/tutores', { method: 'POST', body: JSON.stringify(input) })
+  },
+
+  atualizar(cpf: string, input: TutorInput): Promise<Tutor> {
+    return apiRequest<Tutor>(`/tutores/${cpf}`, { method: 'PUT', body: JSON.stringify(input) })
+  },
+
+  excluir(cpf: string): Promise<void> {
+    return apiRequest<void>(`/tutores/${cpf}`, { method: 'DELETE' })
   },
 }

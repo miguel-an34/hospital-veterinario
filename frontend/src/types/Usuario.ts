@@ -1,10 +1,7 @@
-export interface TutorSummary {
+export interface Usuario {
   cpf: string
   nome: string
   email: string
-}
-
-export interface Tutor extends TutorSummary {
   dataCadastro: string
   enderecoRua: string
   enderecoNumero: string
@@ -12,9 +9,12 @@ export interface Tutor extends TutorSummary {
   enderecoCidade: string
   enderecoCep: string
   telefones: string[]
+  tutor: boolean
+  funcionario: boolean
+  veterinario: boolean
 }
 
-export interface TutorInput {
+export interface UsuarioInput {
   cpf: string
   nome: string
   email: string
