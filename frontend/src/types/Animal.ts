@@ -8,7 +8,8 @@ export interface Animal {
   sexo: SexoAnimal
   dataNascimento: string
   peso: number
+  tutorCpf: string
   tutor: string
 }
 
-export type AnimalInput = Omit<Animal, 'id'>
+export type AnimalInput = Omit<Animal, 'id' | 'tutor'>

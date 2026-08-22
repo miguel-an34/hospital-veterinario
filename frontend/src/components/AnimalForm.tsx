@@ -1,11 +1,13 @@
 import { Save } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import type { AnimalInput, SexoAnimal } from '../types/Animal'
+import type { TutorSummary } from '../types/Tutor'
 
 interface AnimalFormProps {
   initialData?: AnimalInput
   submitting: boolean
   submitLabel: string
+  tutores: TutorSummary[]
   onSubmit: (data: AnimalInput) => Promise<void>
   onCancel: () => void
 }
@@ -17,10 +19,10 @@ const emptyForm: AnimalInput = {
   sexo: 'M',
   dataNascimento: '',
   peso: 0,
-  tutor: '',
+  tutorCpf: '',
 }
 
-export function AnimalForm({ initialData, submitting, submitLabel, onSubmit, onCancel }: AnimalFormProps) {
+export function AnimalForm({ initialData, submitting, submitLabel, tutores, onSubmit, onCancel }: AnimalFormProps) {
   const [form, setForm] = useState<AnimalInput>(initialData ?? emptyForm)
   const [errors, setErrors] = useState<Partial<Record<keyof AnimalInput, string>>>({})
 
@@ -37,7 +39,7 @@ export function AnimalForm({ initialData, submitting, submitLabel, onSubmit, onC
     if (!form.dataNascimento) nextErrors.dataNascimento = 'Informe a data de nascimento.'
     if (form.dataNascimento > new Date().toISOString().split('T')[0]) nextErrors.dataNascimento = 'A data não pode estar no futuro.'
     if (!Number.isFinite(form.peso) || form.peso <= 0) nextErrors.peso = 'Informe um peso maior que zero.'
-    if (!form.tutor.trim()) nextErrors.tutor = 'Informe o tutor responsável.'
+    if (!form.tutorCpf) nextErrors.tutorCpf = 'Selecione o tutor responsável.'
     setErrors(nextErrors)
     return Object.keys(nextErrors).length === 0
   }
@@ -50,7 +52,6 @@ export function AnimalForm({ initialData, submitting, submitLabel, onSubmit, onC
       nome: form.nome.trim(),
       especie: form.especie.trim(),
       raca: form.raca.trim(),
-      tutor: form.tutor.trim(),
     })
   }
 
@@ -114,10 +115,13 @@ export function AnimalForm({ initialData, submitting, submitLabel, onSubmit, onC
 
       <div className="form-grid">
         <label className="field field--wide">
-          <span>Nome do tutor <em>*</em></span>
-          <input value={form.tutor} onChange={(e) => updateField('tutor', e.target.value)} placeholder="Ex.: Marina Almeida" />
-          <small className="field__hint">Quando a API de tutores estiver disponível, este campo poderá ser substituído por uma seleção.</small>
-          {errors.tutor && <small className="field__error">{errors.tutor}</small>}
+          <span>Tutor responsável <em>*</em></span>
+          <select value={form.tutorCpf} onChange={(e) => updateField('tutorCpf', e.target.value)}>
+            <option value="">Selecione um tutor</option>
+            {tutores.map((tutor) => <option key={tutor.cpf} value={tutor.cpf}>{tutor.nome} — CPF {tutor.cpf}</option>)}
+          </select>
+          <small className="field__hint">O vínculo será gravado na tabela Tutor_Animal pelo CPF selecionado.</small>
+          {errors.tutorCpf && <small className="field__error">{errors.tutorCpf}</small>}
         </label>
       </div>
 

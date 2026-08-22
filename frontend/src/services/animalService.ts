@@ -1,7 +1,7 @@
 import type { Animal, AnimalInput, SexoAnimal } from '../types/Animal'
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
-const USE_MOCK_API = import.meta.env.VITE_USE_MOCK_API !== 'false'
+const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080'
+const USE_MOCK_API = import.meta.env.VITE_USE_MOCK_API === 'true'
 const STORAGE_KEY = 'vetcare.animais'
 const MOCK_DELAY = 250
 
@@ -14,6 +14,7 @@ const animaisIniciais: Animal[] = [
     sexo: 'F',
     dataNascimento: '2020-03-12',
     peso: 28.4,
+    tutorCpf: '03627951859',
     tutor: 'Marina Almeida',
   },
   {
@@ -24,6 +25,7 @@ const animaisIniciais: Animal[] = [
     sexo: 'M',
     dataNascimento: '2021-08-05',
     peso: 4.8,
+    tutorCpf: '85167290449',
     tutor: 'Rafael Santos',
   },
   {
@@ -34,6 +36,7 @@ const animaisIniciais: Animal[] = [
     sexo: 'F',
     dataNascimento: '2019-11-23',
     peso: 6.2,
+    tutorCpf: '83906514242',
     tutor: 'Beatriz Costa',
   },
   {
@@ -44,6 +47,7 @@ const animaisIniciais: Animal[] = [
     sexo: 'M',
     dataNascimento: '2022-01-17',
     peso: 5.1,
+    tutorCpf: '72615483919',
     tutor: 'Carlos Oliveira',
   },
   {
@@ -54,6 +58,7 @@ const animaisIniciais: Animal[] = [
     sexo: 'F',
     dataNascimento: '2018-06-30',
     peso: 11.7,
+    tutorCpf: '83412069515',
     tutor: 'Ana Paula Lima',
   },
   {
@@ -64,6 +69,7 @@ const animaisIniciais: Animal[] = [
     sexo: 'M',
     dataNascimento: '2023-02-10',
     peso: 0.09,
+    tutorCpf: '89457361075',
     tutor: 'João Ferreira',
   },
 ]
@@ -80,6 +86,8 @@ interface AnimalApiResponse {
   peso?: number | string | null
   tutor?: string | null
   tutor_nome?: string | null
+  tutorCpf?: string | null
+  tutor_cpf?: string | null
 }
 
 const wait = () => new Promise((resolve) => setTimeout(resolve, MOCK_DELAY))
@@ -93,7 +101,12 @@ function readMockData(): Animal[] {
   }
 
   try {
-    return JSON.parse(stored) as Animal[]
+    return (JSON.parse(stored) as Animal[]).map((animal) => ({
+      ...animal,
+      tutorCpf: animal.tutorCpf
+        ?? animaisIniciais.find((initial) => initial.tutor === animal.tutor)?.tutorCpf
+        ?? '',
+    }))
   } catch {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(animaisIniciais))
     return [...animaisIniciais]
@@ -119,6 +132,7 @@ function normalizeAnimal(animal: AnimalApiResponse): Animal {
     sexo: animal.sexo,
     dataNascimento: animal.dataNascimento ?? animal.data_nascimento ?? '',
     peso: Number(animal.peso ?? 0),
+    tutorCpf: animal.tutorCpf ?? animal.tutor_cpf ?? '',
     tutor: animal.tutor ?? animal.tutor_nome ?? 'Tutor não informado',
   }
 }
@@ -131,7 +145,7 @@ function toApiPayload(animal: AnimalInput) {
     sexo: animal.sexo,
     data_nascimento: animal.dataNascimento || null,
     peso: animal.peso,
-    tutor: animal.tutor,
+    tutor_cpf: animal.tutorCpf,
   }
 }
 
@@ -188,6 +202,7 @@ export const animalService = {
       const novoAnimal: Animal = {
         ...input,
         id: animais.reduce((maior, animal) => Math.max(maior, animal.id), 0) + 1,
+        tutor: animaisIniciais.find((animal) => animal.tutorCpf === input.tutorCpf)?.tutor ?? 'Tutor selecionado',
       }
       writeMockData([...animais, novoAnimal])
       return novoAnimal
@@ -207,7 +222,11 @@ export const animalService = {
       const index = animais.findIndex((animal) => animal.id === id)
       if (index === -1) throw new Error('Animal não encontrado.')
 
-      const animalAtualizado = { ...input, id }
+      const animalAtualizado: Animal = {
+        ...input,
+        id,
+        tutor: animaisIniciais.find((animal) => animal.tutorCpf === input.tutorCpf)?.tutor ?? animais[index].tutor,
+      }
       animais[index] = animalAtualizado
       writeMockData(animais)
       return animalAtualizado

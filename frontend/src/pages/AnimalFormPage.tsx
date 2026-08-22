@@ -5,22 +5,28 @@ import { AnimalForm } from '../components/AnimalForm'
 import { LoadingState } from '../components/LoadingState'
 import { useToast } from '../components/Toast'
 import { animalService } from '../services/animalService'
+import { tutorService } from '../services/tutorService'
 import type { Animal, AnimalInput } from '../types/Animal'
+import type { TutorSummary } from '../types/Tutor'
 
 export function AnimalFormPage() {
   const { id } = useParams()
   const isEditing = Boolean(id)
   const [animal, setAnimal] = useState<Animal | null>(null)
-  const [loading, setLoading] = useState(isEditing)
+  const [tutores, setTutores] = useState<TutorSummary[]>([])
+  const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const navigate = useNavigate()
   const { showToast } = useToast()
 
   useEffect(() => {
-    if (!id) return
-    animalService.buscarPorId(Number(id))
-      .then(setAnimal)
+    const animalRequest = id ? animalService.buscarPorId(Number(id)) : Promise.resolve(null)
+    Promise.all([animalRequest, tutorService.listar()])
+      .then(([loadedAnimal, loadedTutores]) => {
+        setAnimal(loadedAnimal)
+        setTutores(loadedTutores)
+      })
       .catch((err: unknown) => setError(err instanceof Error ? err.message : 'Não foi possível carregar o animal.'))
       .finally(() => setLoading(false))
   }, [id])
@@ -60,6 +66,7 @@ export function AnimalFormPage() {
             initialData={animal ?? undefined}
             submitting={submitting}
             submitLabel={isEditing ? 'Salvar alterações' : 'Cadastrar animal'}
+            tutores={tutores}
             onSubmit={handleSubmit}
             onCancel={() => navigate(isEditing && animal ? `/animais/${animal.id}` : '/animais')}
           />
