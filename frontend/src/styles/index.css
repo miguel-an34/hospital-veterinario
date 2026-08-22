@@ -54,12 +54,6 @@ a.nav-item:hover { color: #fff; background: rgba(255,255,255,.06); }
 .nav-item--active::before { position: absolute; left: -18px; width: 3px; height: 25px; background: #8bc7bb; border-radius: 0 3px 3px 0; content: ""; }
 .nav-item--disabled { cursor: default; color: #779691; }
 .nav-item small { margin-left: auto; padding: 3px 5px; color: #789792; border: 1px solid rgba(158,193,187,.16); border-radius: 4px; font-size: 8px; font-weight: 750; letter-spacing: .45px; text-transform: uppercase; }
-.sidebar__footer { display: flex; align-items: center; gap: 10px; margin: 0 3px; padding: 15px 14px; color: #afc4c0; background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.06); border-radius: 10px; }
-.sidebar__footer > span:last-child { display: flex; flex-direction: column; }
-.sidebar__footer strong { font-size: 11px; }
-.sidebar__footer small { margin-top: 3px; color: #799a95; font-size: 9.5px; }
-.status-dot { width: 8px; height: 8px; background: #77c49a; border: 2px solid #315c50; border-radius: 50%; box-shadow: 0 0 0 3px rgba(119,196,154,.1); }
-
 .main-area { min-height: 100vh; margin-left: 258px; }
 .topbar { height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 38px; background: rgba(255,255,255,.93); border-bottom: 1px solid var(--line); }
 .topbar__system { display: flex; align-items: center; gap: 9px; color: #71807e; font-size: 12px; font-weight: 650; letter-spacing: .15px; }

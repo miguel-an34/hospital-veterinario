@@ -42,10 +42,6 @@ export function Layout() {
           </span>
         </nav>
 
-        <div className="sidebar__footer">
-          <span className="status-dot" />
-          <span><strong>Ambiente acadêmico</strong><small>API REST + MySQL</small></span>
-        </div>
       </aside>
 
       {menuOpen && <button className="sidebar-overlay" onClick={() => setMenuOpen(false)} aria-label="Fechar menu" />}
