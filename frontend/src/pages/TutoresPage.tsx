@@ -64,5 +64,6 @@ export function TutoresPage() {
     emptyValues={emptyValues}
     toFormValues={(item) => ({ ...item, senha: '', telefones: item.telefones.join(', ') } as unknown as FormValues)}
     toInput={toInput}
+    canCreate={false}
   />
 }

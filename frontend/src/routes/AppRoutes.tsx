@@ -7,6 +7,7 @@ import { AnimalListPage } from '../pages/AnimalListPage'
 import { ConsultasPage } from '../pages/ConsultasPage'
 import { DashboardPage } from '../pages/DashboardPage'
 import { ExamesPage } from '../pages/ExamesPage'
+import { FuncionariosPage } from '../pages/FuncionariosPage'
 import { NotFoundPage } from '../pages/NotFoundPage'
 import { RegistrosClinicosPage } from '../pages/RegistrosClinicosPage'
 import { RelatoriosPage } from '../pages/RelatoriosPage'
@@ -24,6 +25,7 @@ export function AppRoutes() {
         <Route path="animais/:id" element={<AnimalDetailsPage />} />
         <Route path="tutores" element={<TutoresPage />} />
         <Route path="usuarios" element={<UsuariosPage />} />
+        <Route path="funcionarios" element={<FuncionariosPage />} />
         <Route path="agendamentos" element={<AgendamentosPage />} />
         <Route path="consultas" element={<ConsultasPage />} />
         <Route path="registros-clinicos" element={<RegistrosClinicosPage />} />

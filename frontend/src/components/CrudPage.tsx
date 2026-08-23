@@ -12,6 +12,12 @@ export interface SelectOption {
   label: string
 }
 
+interface CrudFieldCondition {
+  field: string
+  value?: string
+  values?: string[]
+}
+
 export interface CrudColumn<T> {
   label: string
   render: (item: T) => ReactNode
@@ -40,6 +46,7 @@ export interface CrudField {
   minLength?: number
   pattern?: string
   hint?: string
+  showWhen?: CrudFieldCondition | CrudFieldCondition[]
 }
 
 interface CrudService<T, TInput, TId extends EntityId> {
@@ -64,6 +71,7 @@ interface CrudPageProps<T, TInput, TId extends EntityId> {
   emptyValues: FormValues
   toFormValues: (item: T) => FormValues
   toInput: (values: FormValues) => TInput
+  canCreate?: boolean
 }
 
 type DialogMode = 'create' | 'edit' | 'details' | null
@@ -83,6 +91,7 @@ export function CrudPage<T, TInput, TId extends EntityId>({
   emptyValues,
   toFormValues,
   toInput,
+  canCreate = true,
 }: CrudPageProps<T, TInput, TId>) {
   const [items, setItems] = useState<T[]>([])
   const [loading, setLoading] = useState(true)
@@ -195,7 +204,7 @@ export function CrudPage<T, TInput, TId extends EntityId>({
     <div>
       <header className="page-header">
         <div><p className="eyebrow">{eyebrow}</p><h1>{title}</h1><p>{description}</p></div>
-        <button className="button button--primary" onClick={openCreate}><Plus size={18} /> Novo {singular.toLocaleLowerCase()}</button>
+        {canCreate && <button className="button button--primary" onClick={openCreate}><Plus size={18} /> Novo {singular.toLocaleLowerCase()}</button>}
       </header>
 
       <section className="content-card list-card">
@@ -211,7 +220,7 @@ export function CrudPage<T, TInput, TId extends EntityId>({
         {loading ? <LoadingState label={`Carregando ${title.toLocaleLowerCase()}...`} /> : error ? (
           <div className="error-state"><p>{error}</p><button className="button button--secondary" onClick={loadItems}>Tentar novamente</button></div>
         ) : filteredItems.length === 0 ? (
-          <div className="empty-state"><span><Search size={28} /></span><h2>Nenhum registro encontrado</h2><p>{search ? 'Tente buscar por outro termo.' : `Cadastre o primeiro ${singular.toLocaleLowerCase()}.`}</p></div>
+          <div className="empty-state"><span><Search size={28} /></span><h2>Nenhum registro encontrado</h2><p>{search ? 'Tente buscar por outro termo.' : canCreate ? `Cadastre o primeiro ${singular.toLocaleLowerCase()}.` : 'Nenhum cadastro desse perfil está disponível.'}</p></div>
         ) : (
           <div className="table-scroll">
             <table className="data-table entity-table">
@@ -241,6 +250,13 @@ export function CrudPage<T, TInput, TId extends EntityId>({
             <form onSubmit={handleSubmit}>
               <div className="form-grid entity-dialog__fields">
                 {fields.map((field) => {
+                  const conditions = field.showWhen
+                    ? Array.isArray(field.showWhen) ? field.showWhen : [field.showWhen]
+                    : []
+                  const visible = conditions.every((condition) => condition.values
+                    ? condition.values.includes(values[condition.field])
+                    : values[condition.field] === condition.value)
+                  if (!visible) return null
                   const required = Boolean(field.required && !(isEditing && field.optionalOnEdit))
                   const commonProps = {
                     id: `field-${field.name}`,

@@ -1,4 +1,4 @@
-export interface Usuario {
+export interface Funcionario {
   cpf: string
   nome: string
   email: string
@@ -9,18 +9,16 @@ export interface Usuario {
   enderecoCidade: string
   enderecoCep: string
   telefones: string[]
-  tutor: boolean
-  funcionario: boolean
+  matricula: string
+  cargo: string
+  salario: number
+  dataAdmissao: string
   veterinario: boolean
-  matricula: string | null
-  cargo: string | null
-  salario: number | null
-  dataAdmissao: string | null
   crmv: string | null
   especialidade: string | null
 }
 
-export interface UsuarioInput {
+export interface FuncionarioInput {
   cpf: string
   nome: string
   email: string
@@ -31,13 +29,11 @@ export interface UsuarioInput {
   enderecoCidade: string
   enderecoCep: string
   telefones: string[]
-  tutor: boolean
-  funcionario: boolean
-  matricula: string | null
-  cargo: string | null
-  salario: number | null
-  dataAdmissao: string | null
+  matricula: string
+  cargo: string
+  salario: number
+  dataAdmissao: string
   veterinario: boolean
-  crmv: string | null
-  especialidade: string | null
+  crmv: string
+  especialidade: string
 }
