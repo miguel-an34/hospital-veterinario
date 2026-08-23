@@ -1,4 +1,4 @@
-package br.edu.vetcare.dto.usuario;
+package br.edu.vetcare.dto.funcionario;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -7,11 +7,12 @@ import java.util.List;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-public record UsuarioRequest(
+public record FuncionarioRequest(
         @NotBlank @Pattern(regexp = "\\d{11}") String cpf,
         @NotBlank @Size(max = 100) String nome,
         @NotBlank @Email @Size(max = 100) String email,
@@ -22,12 +23,10 @@ public record UsuarioRequest(
         @NotBlank @Size(max = 60) String enderecoCidade,
         @NotBlank @Size(max = 10) String enderecoCep,
         List<@NotBlank @Size(max = 20) String> telefones,
-        boolean tutor,
-        boolean funcionario,
-        @Size(max = 20) String matricula,
-        @Size(max = 50) String cargo,
-        @DecimalMin(value = "0.00") BigDecimal salario,
-        @PastOrPresent LocalDate dataAdmissao,
+        @NotBlank @Size(max = 20) String matricula,
+        @NotBlank @Size(max = 50) String cargo,
+        @NotNull @DecimalMin(value = "0.00") BigDecimal salario,
+        @NotNull @PastOrPresent LocalDate dataAdmissao,
         boolean veterinario,
         @Size(max = 20) String crmv,
         @Size(max = 60) String especialidade) {

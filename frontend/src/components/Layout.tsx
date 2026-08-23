@@ -1,5 +1,5 @@
 import {
-  CalendarDays, ChartNoAxesCombined, ClipboardPlus, FlaskConical, LayoutDashboard,
+  Briefcase, CalendarDays, ChartNoAxesCombined, ClipboardPlus, FlaskConical, LayoutDashboard,
   Menu, PawPrint, Stethoscope, UserCog, UsersRound, X,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -10,6 +10,7 @@ const managementNavigation = [
   { label: 'Animais', path: '/animais', icon: PawPrint },
   { label: 'Tutores', path: '/tutores', icon: UsersRound },
   { label: 'Usuários', path: '/usuarios', icon: UserCog },
+  { label: 'Funcionários', path: '/funcionarios', icon: Briefcase },
   { label: 'Agendamentos', path: '/agendamentos', icon: CalendarDays },
   { label: 'Consultas', path: '/consultas', icon: Stethoscope },
   { label: 'Registros clínicos', path: '/registros-clinicos', icon: ClipboardPlus },

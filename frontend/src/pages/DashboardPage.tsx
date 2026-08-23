@@ -1,5 +1,5 @@
 import {
-  ArrowRight, CalendarClock, ClipboardList, FlaskConical,
+  ArrowRight, Briefcase, CalendarClock, ClipboardList, FlaskConical,
   PawPrint, Plus, Stethoscope, UserCog, UsersRound,
 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
@@ -15,6 +15,7 @@ const modules = [
   { title: 'Prontuários', description: 'Acesse diagnósticos e evolução clínica.', icon: ClipboardList, path: '/registros-clinicos', accent: 'teal' },
   { title: 'Exames', description: 'Controle solicitações e resultados.', icon: FlaskConical, path: '/exames', accent: 'blue' },
   { title: 'Usuários', description: 'Administre os usuários do sistema.', icon: UserCog, path: '/usuarios', accent: 'sand' },
+  { title: 'Funcionários', description: 'Gerencie a equipe e os vínculos profissionais.', icon: Briefcase, path: '/funcionarios', accent: 'rose' },
 ]
 
 export function DashboardPage() {
