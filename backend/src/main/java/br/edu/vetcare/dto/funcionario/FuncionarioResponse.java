@@ -1,10 +1,10 @@
-package br.edu.vetcare.dto.usuario;
+package br.edu.vetcare.dto.funcionario;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-public record UsuarioResponse(
+public record FuncionarioResponse(
         String cpf,
         String nome,
         String email,
@@ -15,13 +15,11 @@ public record UsuarioResponse(
         String enderecoCidade,
         String enderecoCep,
         List<String> telefones,
-        boolean tutor,
-        boolean funcionario,
-        boolean veterinario,
         String matricula,
         String cargo,
         BigDecimal salario,
         LocalDate dataAdmissao,
+        boolean veterinario,
         String crmv,
         String especialidade) {
 }
