@@ -10,21 +10,24 @@
 Este projeto consiste na implementação física de um banco de dados relacional para um sistema de gestão de um Hospital Veterinário. O esquema lógico foi mapeado a partir de um Diagrama Conceitual (MERE) e estruturado para gerenciar dados de Usuários, Tutores, Funcionários, Veterinários, Animais, além das operações da clínica como Agendamentos, Consultas, Exames, Internações e Registros Clínicos.
 
 ## Ambiente de Execução e Credenciais
-O banco de dados foi disponibilizado para execução local via contêiner Docker. O repositório inclui um arquivo `docker-compose.yml` que configura e inicializa o serviço automaticamente.
+A aplicação completa (banco de dados, backend e frontend) foi disponibilizada para execução local via contêineres Docker. O repositório inclui um arquivo `docker-compose.yml`, na raiz do projeto, que configura e inicializa os três serviços automaticamente.
 
 * **SGBD:** MySQL 8.0
 * **Usuário:** admin
 * **Senha:** adminpassword
 * **Nome do Banco:** vet_hospital
-* **Porta:** 3306
+* **Porta do Banco de Dados:** 3306
+* **Porta do Backend (API):** 8080
+* **Porta do Frontend:** 5173
 
 ### Como executar o projeto
 1. Certifique-se de ter o Docker instalado e rodando em sua máquina.
 2. Clone este repositório.
 3. Na raiz do projeto, execute o comando:
-   ```bash
+```bash
    docker compose up -d
-   ```
+```
+4. Após a inicialização, a aplicação estará acessível em `http://localhost:5173`.
 
 ## Metodologia de Povoamento
 
