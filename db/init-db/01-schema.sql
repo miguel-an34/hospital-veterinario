@@ -85,6 +85,7 @@ CREATE TABLE Consulta (
     id_consulta INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     observacoes TEXT,
     status VARCHAR(20) DEFAULT 'Agendada' NOT NULL,
+    data_hora DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     animal_id INT NOT NULL,
     veterinario_cpf VARCHAR(11) NOT NULL,
     agendamento_id INT UNIQUE NULL,
@@ -125,8 +126,8 @@ CREATE TABLE Alergia (
 -- Tabela Internacao
 CREATE TABLE Internacao (
     animal_id INT NOT NULL,
-    data_entrada DATE NOT NULL,
-    data_alta DATE,
+    data_entrada DATETIME NOT NULL,
+    data_alta DATETIME,
     leito VARCHAR(20) NOT NULL,
     observacoes TEXT,
     PRIMARY KEY (animal_id, data_entrada),
