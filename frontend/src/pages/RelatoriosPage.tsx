@@ -57,13 +57,13 @@ export function RelatoriosPage() {
           <button className="button button--secondary" onClick={loadRelatorios}>Tentar novamente</button>
         </section>
       ) : (
-        <>
+        <div className="reports-list">
           <section className="content-card list-card">
             <div className="card-heading">
               <div><p className="eyebrow">Hoje</p><h2>Agenda diária</h2></div>
               <span className="soft-icon"><CalendarDays size={19} /></span>
             </div>
-            {agenda.length === 0 ? <p>Nenhum agendamento para hoje.</p> : (
+            {agenda.length === 0 ? <p className="reports-empty-message">Nenhum agendamento para hoje.</p> : (
               <div className="table-scroll">
                 <table className="data-table">
                   <thead><tr><th>Horário</th><th>Paciente</th><th>Tutor</th><th>Motivo</th></tr></thead>
@@ -131,7 +131,7 @@ export function RelatoriosPage() {
               </div>
             )}
           </section>
-        </>
+        </div>
       )}
     </div>
   )
