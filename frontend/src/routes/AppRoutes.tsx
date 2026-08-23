@@ -9,6 +9,7 @@ import { DashboardPage } from '../pages/DashboardPage'
 import { ExamesPage } from '../pages/ExamesPage'
 import { NotFoundPage } from '../pages/NotFoundPage'
 import { RegistrosClinicosPage } from '../pages/RegistrosClinicosPage'
+import { RelatoriosPage } from '../pages/RelatoriosPage'
 import { TutoresPage } from '../pages/TutoresPage'
 import { UsuariosPage } from '../pages/UsuariosPage'
 
@@ -28,6 +29,7 @@ export function AppRoutes() {
         <Route path="registros-clinicos" element={<RegistrosClinicosPage />} />
         <Route path="prontuarios" element={<Navigate to="/registros-clinicos" replace />} />
         <Route path="exames" element={<ExamesPage />} />
+        <Route path="relatorios" element={<RelatoriosPage />} />
         <Route path="pacientes" element={<Navigate to="/animais" replace />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>

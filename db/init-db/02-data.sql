@@ -1,3 +1,5 @@
+SET NAMES utf8mb4;
+
 -- 02-data.sql
 -- Script de povoamento (DML) - Sistema de Gestão para Hospital Veterinário
 -- Gerado com dados fictícios plausíveis para fins acadêmicos.

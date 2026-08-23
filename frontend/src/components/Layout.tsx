@@ -37,11 +37,11 @@ export function Layout() {
           ))}
 
           <p className="sidebar__label sidebar__label--spaced">Relatórios</p>
-          <span className="nav-item nav-item--disabled" title="Integração em desenvolvimento">
-            <ChartNoAxesCombined size={19} strokeWidth={1.8} /><span>Visões estratégicas</span><small>Em breve</small>
-          </span>
+          <NavLink to="/relatorios" onClick={() => setMenuOpen(false)} className={({ isActive }) => `nav-item ${isActive ? 'nav-item--active' : ''}`}>
+            <ChartNoAxesCombined size={19} strokeWidth={1.8} /><span>Visões estratégicas</span>
+          </NavLink>
         </nav>
-
+        
       </aside>
 
       {menuOpen && <button className="sidebar-overlay" onClick={() => setMenuOpen(false)} aria-label="Fechar menu" />}

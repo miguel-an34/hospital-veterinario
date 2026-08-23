@@ -16,6 +16,11 @@ server:
   port: ${SERVER_PORT:8080}
   error:
     include-message: never
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
 app:
   cors:

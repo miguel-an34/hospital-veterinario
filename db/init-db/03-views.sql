@@ -1,4 +1,6 @@
---Visão de histórico clínico
+SET NAMES utf8mb4;
+
+-- Visão de histórico clínico
 CREATE VIEW v_historico_clinico AS
 SELECT 
     a.nome AS paciente,
@@ -12,7 +14,7 @@ JOIN RegistroClinico c ON con.id_consulta = c.consulta_id
 JOIN Funcionario f ON con.veterinario_cpf = f.cpf
 JOIN Usuario u ON f.cpf = u.cpf;
 
---Visão de internações ativas
+-- Visão de internações ativas
 CREATE VIEW v_internacoes_ativas AS
 SELECT 
     i.leito,
@@ -26,7 +28,7 @@ JOIN Tutor_Animal ta ON a.id_animal = ta.animal_id
 JOIN Usuario u ON ta.tutor_cpf = u.cpf
 WHERE i.data_alta IS NULL;
 
---Visão da agenda diária
+-- Visão da agenda diária
 CREATE VIEW v_agenda_diaria AS
 SELECT 
     ag.horario,
