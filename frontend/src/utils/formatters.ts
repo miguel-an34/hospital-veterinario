@@ -4,6 +4,18 @@ export function formatarData(data: string): string {
   return new Intl.DateTimeFormat('pt-BR').format(new Date(ano, mes - 1, dia))
 }
 
+export function formatarDataHora(dataHora: string): string {
+  if (!dataHora) return 'Não informada'
+  const [data, horario = ''] = dataHora.split('T')
+  return `${formatarData(data)} às ${horario.slice(0, 5)}`
+}
+
+export function agoraParaInputDataHora(): string {
+  const agora = new Date()
+  const local = new Date(agora.getTime() - agora.getTimezoneOffset() * 60_000)
+  return local.toISOString().slice(0, 16)
+}
+
 export function formatarPeso(peso: number): string {
   return `${new Intl.NumberFormat('pt-BR', {
     minimumFractionDigits: peso < 1 ? 2 : 1,

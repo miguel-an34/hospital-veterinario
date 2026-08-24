@@ -1,5 +1,6 @@
 export interface Consulta {
   id: number
+  dataHora: string
   observacoes: string | null
   status: string
   animalId: number
@@ -10,6 +11,7 @@ export interface Consulta {
 }
 
 export interface ConsultaInput {
+  dataHora: string
   observacoes: string
   status: string
   animalId: number

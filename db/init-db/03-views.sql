@@ -5,7 +5,7 @@ CREATE VIEW v_historico_clinico AS
 SELECT 
     a.nome AS paciente,
     a.especie,
-    c.data_registro AS data_atendimento,
+    con.data_hora AS data_atendimento,
     c.descricao AS diagnostico,
     u.nome AS veterinario_responsavel
 FROM Animal a

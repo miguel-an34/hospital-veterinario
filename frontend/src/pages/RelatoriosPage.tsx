@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { LoadingState } from '../components/LoadingState'
 import { relatorioService } from '../services/relatorioService'
 import type { AgendaDiaria, HistoricoClinico, InternacaoAtiva } from '../types/Relatorio'
-import { formatarData } from '../utils/formatters'
+import { formatarDataHora } from '../utils/formatters'
 
 function formatarHorario(value: string) {
   return value ? value.slice(0, 5) : '—'
@@ -96,7 +96,7 @@ export function RelatoriosPage() {
                       <tr key={index}>
                         <td>{item.leito}</td>
                         <td>{item.paciente}</td>
-                        <td>{formatarData(item.dataEntrada)}</td>
+                        <td>{formatarDataHora(item.dataEntrada)}</td>
                         <td>{item.tutorResponsavel}</td>
                         <td>{item.observacoes || '—'}</td>
                       </tr>
@@ -121,7 +121,7 @@ export function RelatoriosPage() {
                       <tr key={index}>
                         <td>{item.paciente}</td>
                         <td>{item.especie}</td>
-                        <td>{formatarData(item.dataAtendimento)}</td>
+                        <td>{formatarDataHora(item.dataAtendimento)}</td>
                         <td>{item.diagnostico}</td>
                         <td>{item.veterinarioResponsavel}</td>
                       </tr>

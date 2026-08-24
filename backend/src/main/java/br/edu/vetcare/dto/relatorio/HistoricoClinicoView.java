@@ -1,11 +1,11 @@
 package br.edu.vetcare.dto.relatorio;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record HistoricoClinicoView(
         String paciente,
         String especie,
-        LocalDate dataAtendimento,
+        LocalDateTime dataAtendimento,
         String diagnostico,
         String veterinarioResponsavel) {
 }

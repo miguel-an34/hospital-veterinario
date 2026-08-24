@@ -5,6 +5,7 @@ import { animalService } from '../services/animalService'
 import { consultaService } from '../services/consultaService'
 import { veterinarioService } from '../services/veterinarioService'
 import type { Consulta, ConsultaInput } from '../types/Consulta'
+import { agoraParaInputDataHora, formatarDataHora } from '../utils/formatters'
 
 export function ConsultasPage() {
   const [animais, setAnimais] = useState<SelectOption[]>([])
@@ -21,6 +22,7 @@ export function ConsultasPage() {
   }, [])
 
   const fields = useMemo(() => [
+    { name: 'dataHora', label: 'Data e hora', type: 'datetime-local' as const, required: true },
     { name: 'status', label: 'Status', type: 'select' as const, required: true, options: [
       { value: 'Agendada', label: 'Agendada' }, { value: 'Em andamento', label: 'Em andamento' },
       { value: 'Concluída', label: 'Concluída' }, { value: 'Cancelada', label: 'Cancelada' },
@@ -41,6 +43,7 @@ export function ConsultasPage() {
     getLabel={(item) => `Consulta #${item.id}`}
     columns={[
       { label: 'Consulta', render: (item) => <><strong>#{item.id}</strong><small>{item.status}</small></>, searchValue: (item) => `${item.id} ${item.status}` },
+      { label: 'Data e hora', render: (item) => formatarDataHora(item.dataHora), searchValue: (item) => item.dataHora },
       { label: 'Paciente', render: (item) => item.animal, searchValue: (item) => item.animal },
       { label: 'Veterinário', render: (item) => item.veterinario, searchValue: (item) => item.veterinario },
       { label: 'Agendamento', render: (item) => item.agendamentoId ? `#${item.agendamentoId}` : 'Sem vínculo' },
@@ -48,14 +51,15 @@ export function ConsultasPage() {
     ]}
     details={[
       { label: 'Código', render: (item) => `#${item.id}` }, { label: 'Status', render: (item) => item.status },
+      { label: 'Data e hora', render: (item) => formatarDataHora(item.dataHora) },
       { label: 'Paciente', render: (item) => `${item.animal} (#${item.animalId})` },
       { label: 'Veterinário', render: (item) => `${item.veterinario} (${item.veterinarioCpf})` },
       { label: 'Agendamento', render: (item) => item.agendamentoId ? `#${item.agendamentoId}` : 'Sem vínculo' },
       { label: 'Observações', render: (item) => item.observacoes || 'Sem observações' },
     ]}
     fields={fields}
-    emptyValues={{ observacoes: '', status: 'Agendada', animalId: '', veterinarioCpf: '', agendamentoId: '' }}
-    toFormValues={(item) => ({ observacoes: item.observacoes ?? '', status: item.status, animalId: String(item.animalId), veterinarioCpf: item.veterinarioCpf, agendamentoId: item.agendamentoId ? String(item.agendamentoId) : '' })}
-    toInput={(values: FormValues) => ({ observacoes: values.observacoes.trim(), status: values.status, animalId: Number(values.animalId), veterinarioCpf: values.veterinarioCpf, agendamentoId: values.agendamentoId ? Number(values.agendamentoId) : null })}
+    emptyValues={{ dataHora: agoraParaInputDataHora(), observacoes: '', status: 'Agendada', animalId: '', veterinarioCpf: '', agendamentoId: '' }}
+    toFormValues={(item) => ({ dataHora: item.dataHora.slice(0, 16), observacoes: item.observacoes ?? '', status: item.status, animalId: String(item.animalId), veterinarioCpf: item.veterinarioCpf, agendamentoId: item.agendamentoId ? String(item.agendamentoId) : '' })}
+    toInput={(values: FormValues) => ({ dataHora: values.dataHora, observacoes: values.observacoes.trim(), status: values.status, animalId: Number(values.animalId), veterinarioCpf: values.veterinarioCpf, agendamentoId: values.agendamentoId ? Number(values.agendamentoId) : null })}
   />
 }

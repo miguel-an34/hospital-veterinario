@@ -1,11 +1,11 @@
 package br.edu.vetcare.dto.relatorio;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record InternacaoAtivaView(
         String leito,
         String paciente,
-        LocalDate dataEntrada,
+        LocalDateTime dataEntrada,
         String tutorResponsavel,
         String observacoes) {
 }

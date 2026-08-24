@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,7 +42,8 @@ public class AtendimentoRepository {
                     rs.getString("tutor"), rs.getInt("animal_id"), rs.getString("animal"));
 
     private static final RowMapper<ConsultaResponse> CONSULTA_MAPPER = (rs, rowNum) ->
-            new ConsultaResponse(rs.getInt("id_consulta"), rs.getString("observacoes"), rs.getString("status"),
+            new ConsultaResponse(rs.getInt("id_consulta"), rs.getTimestamp("data_hora").toLocalDateTime(),
+                    rs.getString("observacoes"), rs.getString("status"),
                     rs.getInt("animal_id"), rs.getString("animal"), rs.getString("veterinario_cpf"),
                     rs.getString("veterinario"), (Integer) rs.getObject("agendamento_id"));
 
@@ -64,7 +66,7 @@ public class AtendimentoRepository {
             """;
 
     private static final String CONSULTA_SELECT = """
-            SELECT c.id_consulta, c.observacoes, c.status, c.animal_id, a.nome AS animal,
+            SELECT c.id_consulta, c.data_hora, c.observacoes, c.status, c.animal_id, a.nome AS animal,
                    c.veterinario_cpf, u.nome AS veterinario, c.agendamento_id
               FROM Consulta c
               JOIN Animal a ON a.id_animal = c.animal_id
@@ -135,25 +137,27 @@ public class AtendimentoRepository {
     public int insertConsulta(ConsultaRequest request) {
         return generatedKey(connection -> {
             PreparedStatement ps = connection.prepareStatement("""
-                    INSERT INTO Consulta (observacoes, status, animal_id, veterinario_cpf, agendamento_id)
-                    VALUES (?, ?, ?, ?, ?)
+                    INSERT INTO Consulta (data_hora, observacoes, status, animal_id, veterinario_cpf, agendamento_id)
+                    VALUES (?, ?, ?, ?, ?, ?)
                     """, Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, blankToNull(request.observacoes()));
-            ps.setString(2, request.status().trim());
-            ps.setInt(3, request.animalId());
-            ps.setString(4, request.veterinarioCpf());
-            if (request.agendamentoId() == null) ps.setNull(5, java.sql.Types.INTEGER);
-            else ps.setInt(5, request.agendamentoId());
+            ps.setTimestamp(1, Timestamp.valueOf(request.dataHora()));
+            ps.setString(2, blankToNull(request.observacoes()));
+            ps.setString(3, request.status().trim());
+            ps.setInt(4, request.animalId());
+            ps.setString(5, request.veterinarioCpf());
+            if (request.agendamentoId() == null) ps.setNull(6, java.sql.Types.INTEGER);
+            else ps.setInt(6, request.agendamentoId());
             return ps;
         });
     }
 
     public int updateConsulta(int id, ConsultaRequest request) {
         return jdbcClient.sql("""
-                UPDATE Consulta SET observacoes=:observacoes, status=:status, animal_id=:animalId,
+                UPDATE Consulta SET data_hora=:dataHora, observacoes=:observacoes, status=:status, animal_id=:animalId,
                        veterinario_cpf=:veterinarioCpf, agendamento_id=:agendamentoId
                  WHERE id_consulta=:id
-                """).param("observacoes", blankToNull(request.observacoes())).param("status", request.status().trim())
+                """).param("dataHora", Timestamp.valueOf(request.dataHora()))
+                .param("observacoes", blankToNull(request.observacoes())).param("status", request.status().trim())
                 .param("animalId", request.animalId()).param("veterinarioCpf", request.veterinarioCpf())
                 .param("agendamentoId", request.agendamentoId()).param("id", id).update();
     }
