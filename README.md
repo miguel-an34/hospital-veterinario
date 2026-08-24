@@ -29,6 +29,9 @@ A aplicação completa (banco de dados, backend e frontend) foi disponibilizada 
 ```
 4. Após a inicialização, a aplicação estará acessível em `http://localhost:5173`.
 
+## Dicionário de Dados
+O dicionário de dados completo, com a descrição de todas as tabelas, atributos, tipos, restrições e semântica de cada campo, está disponível no arquivo [`Dicionário de Dados.pdf`](./Dicionário%20de%20Dados.pdf), anexado na raiz deste repositório.
+
 ## Metodologia de Povoamento
 
 O banco foi povoado através de um script DML (`db/init-db/02-data.sql`), executado automaticamente pelo container na inicialização, logo após o `01-schema.sql`. O MySQL processa os arquivos de `docker-entrypoint-initdb.d/` em ordem alfabética na primeira vez que o volume é criado — por isso o script de dados foi nomeado com o prefixo `02-`, garantindo que rode depois do schema.
