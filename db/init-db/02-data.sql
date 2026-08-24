@@ -369,26 +369,26 @@ INSERT INTO Alergia (animal_id, descricao) VALUES
 -- Tabela: Internacao
 -- =========================================================
 INSERT INTO Internacao (animal_id, data_entrada, data_alta, leito, observacoes) VALUES
-(25, '2026-03-02', '2026-03-03', 'L11', 'Animal em observação clínica após procedimento cirúrgico.'),
-(17, '2024-08-03', '2024-08-16', 'L04', NULL),
-(35, '2025-03-10', NULL, 'L04', 'Monitoramento de função renal.'),
-(47, '2026-04-28', '2026-05-10', 'L13', 'Em tratamento para quadro infeccioso.'),
-(19, '2025-10-24', NULL, 'L02', NULL),
-(2, '2025-12-03', '2025-12-11', 'L12', 'Recuperação pós-operatória sem intercorrências.'),
-(34, '2024-02-08', '2024-02-09', 'L03', 'Recuperação pós-operatória sem intercorrências.'),
-(24, '2025-07-25', '2025-08-08', 'L04', 'Recuperação pós-operatória sem intercorrências.'),
-(33, '2025-02-21', '2025-03-04', 'L07', 'Em tratamento para quadro infeccioso.'),
-(42, '2024-11-19', '2024-11-30', 'L02', 'Monitoramento de função renal.'),
-(29, '2024-01-07', '2024-01-17', 'L02', NULL),
-(32, '2025-08-22', '2025-09-05', 'L02', 'Recuperação pós-operatória sem intercorrências.'),
-(3, '2025-05-29', '2025-06-11', 'L11', 'Recuperação pós-operatória sem intercorrências.'),
-(46, '2025-09-13', '2025-09-26', 'L15', 'Em tratamento para quadro infeccioso.'),
-(13, '2025-01-25', '2025-02-05', 'L01', 'Em tratamento para quadro infeccioso.'),
-(21, '2024-06-09', '2024-06-12', 'L12', 'Em tratamento para quadro infeccioso.'),
-(41, '2026-03-26', NULL, 'L09', 'Recuperação pós-operatória sem intercorrências.'),
-(6, '2025-10-11', '2025-10-22', 'L15', NULL),
-(7, '2025-10-25', '2025-10-26', 'L09', 'Monitoramento de função renal.'),
-(44, '2024-05-24', '2024-05-25', 'L10', 'Monitoramento de função renal.');
+(25, '2026-03-02 08:15:00', '2026-03-03 14:30:00', 'L11', 'Animal em observação clínica após procedimento cirúrgico.'),
+(17, '2024-08-03 17:40:00', '2024-08-16 10:00:00', 'L04', NULL),
+(35, '2025-03-10 09:20:00', NULL, 'L04', 'Monitoramento de função renal.'),
+(47, '2026-04-28 21:10:00', '2026-05-10 11:45:00', 'L13', 'Em tratamento para quadro infeccioso.'),
+(19, '2025-10-24 13:05:00', NULL, 'L02', NULL),
+(2, '2025-12-03 07:50:00', '2025-12-11 16:20:00', 'L12', 'Recuperação pós-operatória sem intercorrências.'),
+(34, '2024-02-08 18:35:00', '2024-02-09 12:10:00', 'L03', 'Recuperação pós-operatória sem intercorrências.'),
+(24, '2025-07-25 10:30:00', '2025-08-08 09:15:00', 'L04', 'Recuperação pós-operatória sem intercorrências.'),
+(33, '2025-02-21 15:25:00', '2025-03-04 11:00:00', 'L07', 'Em tratamento para quadro infeccioso.'),
+(42, '2024-11-19 20:45:00', '2024-11-30 13:30:00', 'L02', 'Monitoramento de função renal.'),
+(29, '2024-01-07 11:10:00', '2024-01-17 08:40:00', 'L02', NULL),
+(32, '2025-08-22 16:55:00', '2025-09-05 10:25:00', 'L02', 'Recuperação pós-operatória sem intercorrências.'),
+(3, '2025-05-29 19:15:00', '2025-06-11 14:05:00', 'L11', 'Recuperação pós-operatória sem intercorrências.'),
+(46, '2025-09-13 08:40:00', '2025-09-26 15:50:00', 'L15', 'Em tratamento para quadro infeccioso.'),
+(13, '2025-01-25 14:20:00', '2025-02-05 09:35:00', 'L01', 'Em tratamento para quadro infeccioso.'),
+(21, '2024-06-09 22:05:00', '2024-06-12 12:00:00', 'L12', 'Em tratamento para quadro infeccioso.'),
+(41, '2026-03-26 06:45:00', NULL, 'L09', 'Recuperação pós-operatória sem intercorrências.'),
+(6, '2025-10-11 12:35:00', '2025-10-22 17:10:00', 'L15', NULL),
+(7, '2025-10-25 23:15:00', '2025-10-26 08:30:00', 'L09', 'Monitoramento de função renal.'),
+(44, '2024-05-24 09:05:00', '2024-05-25 11:20:00', 'L10', 'Monitoramento de função renal.');
 
 -- =========================================================
 -- Tabela: Agendamento
@@ -514,6 +514,19 @@ INSERT INTO Consulta (id_consulta, observacoes, status, animal_id, veterinario_c
 (53, 'Avaliação pré-anestésica realizada, animal apto para procedimento.', 'Concluída', 23, '41029367850', NULL),
 (54, 'Avaliação pré-anestésica realizada, animal apto para procedimento.', 'Concluída', 12, '43815092698', NULL),
 (55, 'Paciente estável, sem sinais de dor ou desconforto.', 'Em andamento', 32, '34265098142', NULL);
+
+-- Consultas agendadas herdam o instante previsto do agendamento.
+UPDATE Consulta c
+JOIN Agendamento ag ON ag.id_agendamento = c.agendamento_id
+SET c.data_hora = TIMESTAMP(ag.data, ag.horario);
+
+-- Consultas sem agendamento representam atendimentos de demanda espontânea/urgência.
+UPDATE Consulta
+SET data_hora = TIMESTAMP(
+    DATE_ADD('2024-06-01', INTERVAL ((id_consulta - 36) * 31) DAY),
+    MAKETIME(8 + MOD(id_consulta, 10), MOD(id_consulta, 2) * 30, 0)
+)
+WHERE agendamento_id IS NULL;
 
 -- =========================================================
 -- Tabela: RegistroClinico

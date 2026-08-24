@@ -21,7 +21,7 @@ public class RelatorioRepository {
         return jdbcClient.sql("SELECT * FROM v_historico_clinico ORDER BY data_atendimento DESC, paciente")
                 .query((rs, rowNum) -> new HistoricoClinicoView(
                         rs.getString("paciente"), rs.getString("especie"),
-                        rs.getDate("data_atendimento").toLocalDate(), rs.getString("diagnostico"),
+                        rs.getTimestamp("data_atendimento").toLocalDateTime(), rs.getString("diagnostico"),
                         rs.getString("veterinario_responsavel")))
                 .list();
     }
@@ -30,7 +30,7 @@ public class RelatorioRepository {
         return jdbcClient.sql("SELECT * FROM v_internacoes_ativas ORDER BY data_entrada, leito")
                 .query((rs, rowNum) -> new InternacaoAtivaView(
                         rs.getString("leito"), rs.getString("paciente"),
-                        rs.getDate("data_entrada").toLocalDate(), rs.getString("tutor_responsavel"),
+                        rs.getTimestamp("data_entrada").toLocalDateTime(), rs.getString("tutor_responsavel"),
                         rs.getString("observacoes")))
                 .list();
     }

@@ -83,9 +83,9 @@ CREATE TABLE Agendamento (
 -- Tabela Consulta
 CREATE TABLE Consulta (
     id_consulta INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    data_hora DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     observacoes TEXT,
     status VARCHAR(20) DEFAULT 'Agendada' NOT NULL,
-    data_hora DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     animal_id INT NOT NULL,
     veterinario_cpf VARCHAR(11) NOT NULL,
     agendamento_id INT UNIQUE NULL,
@@ -125,11 +125,13 @@ CREATE TABLE Alergia (
 
 -- Tabela Internacao
 CREATE TABLE Internacao (
+    id_internacao INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     animal_id INT NOT NULL,
     data_entrada DATETIME NOT NULL,
     data_alta DATETIME,
     leito VARCHAR(20) NOT NULL,
     observacoes TEXT,
-    PRIMARY KEY (animal_id, data_entrada),
-    FOREIGN KEY (animal_id) REFERENCES Animal(id_animal) ON DELETE CASCADE
+    FOREIGN KEY (animal_id) REFERENCES Animal(id_animal) ON DELETE CASCADE,
+    INDEX idx_internacao_animal_data (animal_id, data_entrada),
+    CHECK (data_alta IS NULL OR data_alta >= data_entrada)
 );

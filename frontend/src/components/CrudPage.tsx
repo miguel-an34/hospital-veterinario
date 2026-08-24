@@ -32,7 +32,7 @@ export interface CrudDetail<T> {
 export interface CrudField {
   name: string
   label: string
-  type?: 'text' | 'email' | 'password' | 'date' | 'time' | 'number' | 'tel' | 'select' | 'textarea'
+  type?: 'text' | 'email' | 'password' | 'date' | 'datetime-local' | 'time' | 'number' | 'tel' | 'select' | 'textarea'
   placeholder?: string
   required?: boolean
   optionalOnEdit?: boolean
