@@ -29,6 +29,9 @@ A aplicação completa (banco de dados, backend e frontend) foi disponibilizada 
 ```
 4. Após a inicialização, a aplicação estará acessível em `http://localhost:5173`.
 
+## Esquema Lógico (Diagrama UML)
+O diagrama lógico do banco de dados, já com as correções aplicadas a partir da devolutiva da 1ª entrega parcial, está disponível no arquivo [`Diagrama UML.pdf`](./Diagrama%20UML.pdf), anexado na raiz deste repositório.
+
 ## Dicionário de Dados
 O dicionário de dados completo, com a descrição de todas as tabelas, atributos, tipos, restrições e semântica de cada campo, está disponível no arquivo [`Dicionário de Dados.pdf`](./Dicionário%20de%20Dados.pdf), anexado na raiz deste repositório.
 
