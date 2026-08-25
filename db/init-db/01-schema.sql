@@ -27,7 +27,7 @@ CREATE TABLE Funcionario (
     cpf VARCHAR(11) PRIMARY KEY NOT NULL,
     matricula VARCHAR(20) UNIQUE NOT NULL,
     cargo VARCHAR(50) NOT NULL,
-    salario DECIMAL(10,2) NOT NULL,
+    salario DECIMAL(10,2) NOT NULL CHECK (salario >= 0), 
     data_admissao DATE NOT NULL,
     FOREIGN KEY (cpf) REFERENCES Usuario(cpf) ON DELETE CASCADE
 );
@@ -55,7 +55,7 @@ CREATE TABLE Animal (
     especie VARCHAR(40) NOT NULL,
     raca VARCHAR(40),
     sexo CHAR(1) NOT NULL CHECK (sexo IN ('M', 'F')),
-    peso DECIMAL(5,2),
+    peso DECIMAL(5,2) CHECK (peso >= 0),
     data_nascimento DATE
 );
 
@@ -112,7 +112,8 @@ CREATE TABLE Exame (
     data_solicitacao DATE DEFAULT (CURRENT_DATE) NOT NULL,
     data_resultado DATE,
     consulta_id INT NOT NULL,
-    FOREIGN KEY (consulta_id) REFERENCES Consulta(id_consulta) ON DELETE CASCADE
+    FOREIGN KEY (consulta_id) REFERENCES Consulta(id_consulta),
+    CHECK (data_resultado >= data_solicitacao)
 );
 
 -- Tabela Alergia
@@ -125,13 +126,12 @@ CREATE TABLE Alergia (
 
 -- Tabela Internacao
 CREATE TABLE Internacao (
-    id_internacao INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     animal_id INT NOT NULL,
     data_entrada DATETIME NOT NULL,
     data_alta DATETIME,
     leito VARCHAR(20) NOT NULL,
     observacoes TEXT,
-    FOREIGN KEY (animal_id) REFERENCES Animal(id_animal) ON DELETE CASCADE,
-    INDEX idx_internacao_animal_data (animal_id, data_entrada),
-    CHECK (data_alta IS NULL OR data_alta >= data_entrada)
+    PRIMARY KEY (animal_id, data_entrada),
+    FOREIGN KEY (animal_id) REFERENCES Animal(id_animal),
+    CHECK (data_alta >= data_entrada)
 );
