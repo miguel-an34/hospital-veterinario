@@ -85,7 +85,7 @@ CREATE TABLE Agendamento (
 CREATE TABLE Consulta (
     id_consulta INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     observacoes TEXT,
-    status VARCHAR(20) DEFAULT 'Agendada' NOT NULL,
+    status ENUM('Agendada', 'Em andamento', 'Concluída', 'Cancelada') DEFAULT 'Agendada' NOT NULL,
     data_hora DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     animal_id INT NOT NULL,
     veterinario_cpf VARCHAR(11) NOT NULL,
