@@ -1,4 +1,5 @@
 -- 04-triggers.sql
+SET NAMES utf8mb4;
 
 -- Esse gatilho altera automaticamente o status da tabela Consulta para "Concluída" no exato momento que o veterinário insere as anotações médicas no prontuário.
 
