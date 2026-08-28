@@ -45,7 +45,8 @@ CREATE TABLE Telefone (
     id_telefone INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     usuario_cpf VARCHAR(11) NOT NULL,
     numero VARCHAR(20) NOT NULL,
-    FOREIGN KEY (usuario_cpf) REFERENCES Usuario(cpf) ON DELETE CASCADE
+    FOREIGN KEY (usuario_cpf) REFERENCES Usuario(cpf) ON DELETE CASCADE,
+    UNIQUE (usuario_cpf, numero)
 );
 
 -- Tabela Animal
@@ -83,13 +84,13 @@ CREATE TABLE Agendamento (
 -- Tabela Consulta
 CREATE TABLE Consulta (
     id_consulta INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    data_hora DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     observacoes TEXT,
     status VARCHAR(20) DEFAULT 'Agendada' NOT NULL,
+    data_hora DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     animal_id INT NOT NULL,
     veterinario_cpf VARCHAR(11) NOT NULL,
     agendamento_id INT UNIQUE NULL,
-    FOREIGN KEY (animal_id) REFERENCES Animal(id_animal) ON DELETE CASCADE,
+    FOREIGN KEY (animal_id) REFERENCES Animal(id_animal) ON DELETE RESTRICT,
     FOREIGN KEY (veterinario_cpf) REFERENCES Veterinario(cpf) ON DELETE RESTRICT,
     FOREIGN KEY (agendamento_id) REFERENCES Agendamento(id_agendamento) ON DELETE SET NULL
 );
@@ -100,7 +101,7 @@ CREATE TABLE RegistroClinico (
     descricao TEXT NOT NULL,
     data_registro DATE DEFAULT (CURRENT_DATE) NOT NULL,
     consulta_id INT NOT NULL,
-    FOREIGN KEY (consulta_id) REFERENCES Consulta(id_consulta) ON DELETE CASCADE
+    FOREIGN KEY (consulta_id) REFERENCES Consulta(id_consulta) ON DELETE RESTRICT
 );
 
 -- Tabela Exame
@@ -112,7 +113,7 @@ CREATE TABLE Exame (
     data_solicitacao DATE DEFAULT (CURRENT_DATE) NOT NULL,
     data_resultado DATE,
     consulta_id INT NOT NULL,
-    FOREIGN KEY (consulta_id) REFERENCES Consulta(id_consulta),
+    FOREIGN KEY (consulta_id) REFERENCES Consulta(id_consulta) ON DELETE RESTRICT,
     CHECK (data_resultado >= data_solicitacao)
 );
 
@@ -121,7 +122,8 @@ CREATE TABLE Alergia (
     id_alergia INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     animal_id INT NOT NULL,
     descricao VARCHAR(100) NOT NULL,
-    FOREIGN KEY (animal_id) REFERENCES Animal(id_animal) ON DELETE CASCADE
+    FOREIGN KEY (animal_id) REFERENCES Animal(id_animal) ON DELETE CASCADE,
+    UNIQUE (animal_id, descricao)
 );
 
 -- Tabela Internacao
@@ -132,6 +134,6 @@ CREATE TABLE Internacao (
     leito VARCHAR(20) NOT NULL,
     observacoes TEXT,
     PRIMARY KEY (animal_id, data_entrada),
-    FOREIGN KEY (animal_id) REFERENCES Animal(id_animal),
+    FOREIGN KEY (animal_id) REFERENCES Animal(id_animal) ON DELETE RESTRICT,
     CHECK (data_alta >= data_entrada)
 );

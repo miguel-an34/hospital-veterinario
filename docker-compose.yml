@@ -3,6 +3,7 @@ name: vetcare
 services:
   db:
     image: mysql:8.0
+    command: --log-bin-trust-function-creators=1
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: vet_hospital
