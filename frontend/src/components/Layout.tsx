@@ -39,7 +39,7 @@ export function Layout() {
 
           <p className="sidebar__label sidebar__label--spaced">Relatórios</p>
           <NavLink to="/relatorios" onClick={() => setMenuOpen(false)} className={({ isActive }) => `nav-item ${isActive ? 'nav-item--active' : ''}`}>
-            <ChartNoAxesCombined size={19} strokeWidth={1.8} /><span>Visões estratégicas</span>
+            <ChartNoAxesCombined size={19} strokeWidth={1.8} /><span>Relatórios analíticos</span>
           </NavLink>
         </nav>
         

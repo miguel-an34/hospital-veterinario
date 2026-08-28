@@ -1,31 +1,81 @@
 package br.edu.vetcare.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import br.edu.vetcare.dto.relatorio.AgendaDiariaView;
+import br.edu.vetcare.dto.relatorio.AtendimentoPorProfissionalView;
 import br.edu.vetcare.dto.relatorio.HistoricoClinicoView;
+import br.edu.vetcare.dto.relatorio.HistoricoPorPacienteView;
 import br.edu.vetcare.dto.relatorio.InternacaoAtivaView;
-import br.edu.vetcare.repository.RelatorioRepository;
+import br.edu.vetcare.service.RelatorioService;
 
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/relatorios")
+@RequestMapping({"/relatorios", "/api/relatorios"})
 public class RelatorioController {
-    private final RelatorioRepository repository;
+    private final RelatorioService service;
 
-    public RelatorioController(RelatorioRepository repository) {
-        this.repository = repository;
+    public RelatorioController(RelatorioService service) {
+        this.service = service;
     }
 
     @GetMapping("/historico-clinico")
-    public List<HistoricoClinicoView> historicoClinico() { return repository.historicoClinico(); }
+    public List<HistoricoClinicoView> historicoClinico() { return service.historicoClinico(); }
 
     @GetMapping("/internacoes-ativas")
-    public List<InternacaoAtivaView> internacoesAtivas() { return repository.internacoesAtivas(); }
+    public List<InternacaoAtivaView> internacoesAtivas() { return service.internacoesAtivas(); }
 
     @GetMapping("/agenda-diaria")
-    public List<AgendaDiariaView> agendaDiaria() { return repository.agendaDiaria(); }
+    public List<AgendaDiariaView> agendaDiaria() { return service.agendaDiaria(); }
+
+    @GetMapping("/atendimentos")
+    public List<AtendimentoPorProfissionalView> atendimentos(
+            @RequestParam(name = "data_inicio", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+            @RequestParam(name = "data_fim", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim) {
+        return service.atendimentos(dataInicio, dataFim);
+    }
+
+    @GetMapping("/historico")
+    public List<HistoricoPorPacienteView> historico(
+            @RequestParam(name = "data_inicio", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+            @RequestParam(name = "data_fim", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim) {
+        return service.historico(dataInicio, dataFim);
+    }
+
+    @GetMapping(value = "/atendimentos/csv", produces = "text/csv; charset=UTF-8")
+    public ResponseEntity<byte[]> exportarAtendimentosCsv(
+            @RequestParam(name = "data_inicio", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+            @RequestParam(name = "data_fim", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim) {
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=relatorio-atendimentos.csv")
+                .contentType(MediaType.parseMediaType("text/csv; charset=UTF-8"))
+                .body(service.exportarAtendimentosCsv(dataInicio, dataFim));
+    }
+
+    @GetMapping(value = "/historico/csv", produces = "text/csv; charset=UTF-8")
+    public ResponseEntity<byte[]> exportarHistoricoCsv(
+            @RequestParam(name = "data_inicio", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+            @RequestParam(name = "data_fim", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim) {
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=relatorio-historico.csv")
+                .contentType(MediaType.parseMediaType("text/csv; charset=UTF-8"))
+                .body(service.exportarHistoricoCsv(dataInicio, dataFim));
+    }
 }

@@ -1,137 +1,212 @@
-import { CalendarDays, ClipboardPlus, Stethoscope } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { CalendarRange, Download, FileBarChart2 } from 'lucide-react'
+import { useMemo, useState } from 'react'
 import { LoadingState } from '../components/LoadingState'
 import { relatorioService } from '../services/relatorioService'
-import type { AgendaDiaria, HistoricoClinico, InternacaoAtiva } from '../types/Relatorio'
-import { formatarDataHora } from '../utils/formatters'
-
-function formatarHorario(value: string) {
-  return value ? value.slice(0, 5) : '—'
-}
+import type { AtendimentoPorProfissional, HistoricoPorPaciente, TipoRelatorio } from '../types/Relatorio'
+import { formatarCompetencia, formatarData, formatarDataHora, formatarMoeda, formatarPeso } from '../utils/formatters'
 
 export function RelatoriosPage() {
-  const [agenda, setAgenda] = useState<AgendaDiaria[]>([])
-  const [internacoes, setInternacoes] = useState<InternacaoAtiva[]>([])
-  const [historico, setHistorico] = useState<HistoricoClinico[]>([])
-  const [loading, setLoading] = useState(true)
+  const [tipo, setTipo] = useState<TipoRelatorio>('atendimentos')
+  const [dataInicio, setDataInicio] = useState('')
+  const [dataFim, setDataFim] = useState('')
+  const [atendimentos, setAtendimentos] = useState<AtendimentoPorProfissional[]>([])
+  const [historico, setHistorico] = useState<HistoricoPorPaciente[]>([])
+  const [loading, setLoading] = useState(false)
+  const [exporting, setExporting] = useState(false)
+  const [hasGenerated, setHasGenerated] = useState(false)
   const [error, setError] = useState('')
 
-  const loadRelatorios = async () => {
+  const filtros = useMemo(() => ({
+    dataInicio: dataInicio || undefined,
+    dataFim: dataFim || undefined,
+  }), [dataFim, dataInicio])
+
+  const gerarRelatorio = async () => {
     setLoading(true)
     setError('')
     try {
-      const [agendaData, internacoesData, historicoData] = await Promise.all([
-        relatorioService.agendaDiaria(),
-        relatorioService.internacoesAtivas(),
-        relatorioService.historicoClinico(),
-      ])
-      setAgenda(agendaData)
-      setInternacoes(internacoesData)
-      setHistorico(historicoData)
+      if (tipo === 'atendimentos') {
+        const data = await relatorioService.atendimentos(filtros)
+        setAtendimentos(data)
+        setHistorico([])
+      } else {
+        const data = await relatorioService.historico(filtros)
+        setHistorico(data)
+        setAtendimentos([])
+      }
+      setHasGenerated(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Não foi possível carregar os relatórios.')
+      setError(err instanceof Error ? err.message : 'Não foi possível carregar o relatório.')
     } finally {
       setLoading(false)
     }
   }
 
-  useEffect(() => {
-    void loadRelatorios()
-  }, [])
+  const exportarCsv = async () => {
+    setExporting(true)
+    setError('')
+    try {
+      const blob = await relatorioService.exportarCsv(tipo, filtros)
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = tipo === 'atendimentos' ? 'relatorio-atendimentos.csv' : 'relatorio-historico.csv'
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Não foi possível exportar o relatório.')
+    } finally {
+      setExporting(false)
+    }
+  }
+
+  const relatorioVazio = tipo === 'atendimentos' ? atendimentos.length === 0 : historico.length === 0
 
   return (
     <div>
       <header className="page-header">
         <div>
           <p className="eyebrow">Relatórios</p>
-          <h1>Visões estratégicas</h1>
-          <p>Consolidado de agenda, internações e histórico clínico direto do banco de dados.</p>
+          <h1>Central analítica</h1>
+          <p>Gere relatórios por período, visualize no navegador e exporte o resultado filtrado em CSV.</p>
         </div>
       </header>
 
+      <section className="content-card reports-filter-card">
+        <div className="reports-filter-grid">
+          <label className="field">
+            <span>Relatório</span>
+            <select value={tipo} onChange={(event) => setTipo(event.target.value as TipoRelatorio)}>
+              <option value="atendimentos">Atendimentos</option>
+              <option value="historico">Histórico por paciente</option>
+            </select>
+          </label>
+
+          <label className="field">
+            <span>Data inicial</span>
+            <input type="date" value={dataInicio} onChange={(event) => setDataInicio(event.target.value)} />
+          </label>
+
+          <label className="field">
+            <span>Data final</span>
+            <input type="date" value={dataFim} onChange={(event) => setDataFim(event.target.value)} />
+          </label>
+
+          <div className="reports-filter-actions">
+            <button className="button button--primary" onClick={gerarRelatorio} disabled={loading}>
+              {loading ? <span className="button-spinner" /> : <FileBarChart2 size={16} />}
+              <span>Gerar Relatório</span>
+            </button>
+            <button className="button button--secondary" onClick={exportarCsv} disabled={loading || exporting}>
+              {exporting ? <span className="button-spinner" /> : <Download size={16} />}
+              <span>Baixar CSV</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
       {loading ? (
-        <section className="content-card"><LoadingState label="Carregando relatórios..." /></section>
+        <section className="content-card"><LoadingState label="Gerando relatório..." /></section>
       ) : error ? (
         <section className="content-card error-state">
           <p>{error}</p>
-          <button className="button button--secondary" onClick={loadRelatorios}>Tentar novamente</button>
+          <button className="button button--secondary" onClick={gerarRelatorio}>Tentar novamente</button>
+        </section>
+      ) : !hasGenerated ? (
+        <section className="content-card empty-state">
+          <span><FileBarChart2 size={24} /></span>
+          <h2>Selecione os filtros para iniciar</h2>
+          <p>Escolha o tipo de relatório, defina o período desejado e clique em gerar relatório.</p>
+        </section>
+      ) : relatorioVazio ? (
+        <section className="content-card empty-state">
+          <span><CalendarRange size={24} /></span>
+          <h2>Nenhum registro encontrado</h2>
+          <p>Ajuste o tipo de relatório ou o período informado e gere novamente.</p>
         </section>
       ) : (
-        <div className="reports-list">
-          <section className="content-card list-card">
-            <div className="card-heading">
-              <div><p className="eyebrow">Hoje</p><h2>Agenda diária</h2></div>
-              <span className="soft-icon"><CalendarDays size={19} /></span>
+        <section className="content-card list-card">
+          <div className="card-heading">
+            <div>
+              <p className="eyebrow">{tipo === 'atendimentos' ? 'Resumo financeiro e volume' : 'Prontuário consolidado'}</p>
+              <h2>{tipo === 'atendimentos' ? 'Atendimentos por profissional' : 'Histórico por paciente'}</h2>
             </div>
-            {agenda.length === 0 ? <p className="reports-empty-message">Nenhum agendamento para hoje.</p> : (
-              <div className="table-scroll">
-                <table className="data-table">
-                  <thead><tr><th>Horário</th><th>Paciente</th><th>Tutor</th><th>Motivo</th></tr></thead>
-                  <tbody>
-                    {agenda.map((item, index) => (
-                      <tr key={index}>
-                        <td>{formatarHorario(item.horario)}</td>
-                        <td>{item.paciente}</td>
-                        <td>{item.tutor}</td>
-                        <td>{item.motivo}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </section>
+            <span className="soft-icon"><FileBarChart2 size={19} /></span>
+          </div>
 
-          <section className="content-card list-card">
-            <div className="card-heading">
-              <div><p className="eyebrow">Leitos ocupados</p><h2>Internações ativas</h2></div>
-              <span className="soft-icon"><Stethoscope size={19} /></span>
+          {tipo === 'atendimentos' ? (
+            <div className="table-scroll">
+              <table className="data-table reports-table">
+                <thead>
+                  <tr>
+                    <th>Profissional</th>
+                    <th>Competência</th>
+                    <th>Quantidade</th>
+                    <th>Faturamento</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {atendimentos.map((item) => (
+                    <tr key={`${item.veterinarioCpf}-${item.ano}-${item.mes}`}>
+                      <td>
+                        <strong>{item.profissional}</strong>
+                        <small>CPF {item.veterinarioCpf}</small>
+                      </td>
+                      <td>{formatarCompetencia(item.ano, item.mes)}</td>
+                      <td>{item.quantidadeAtendimentos}</td>
+                      <td>{formatarMoeda(item.faturamentoTotal)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            {internacoes.length === 0 ? <p>Nenhuma internação ativa no momento.</p> : (
-              <div className="table-scroll">
-                <table className="data-table">
-                  <thead><tr><th>Leito</th><th>Paciente</th><th>Entrada</th><th>Tutor</th><th>Observações</th></tr></thead>
-                  <tbody>
-                    {internacoes.map((item, index) => (
-                      <tr key={index}>
-                        <td>{item.leito}</td>
-                        <td>{item.paciente}</td>
-                        <td>{formatarDataHora(item.dataEntrada)}</td>
-                        <td>{item.tutorResponsavel}</td>
-                        <td>{item.observacoes || '—'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </section>
-
-          <section className="content-card list-card">
-            <div className="card-heading">
-              <div><p className="eyebrow">Prontuário</p><h2>Histórico clínico</h2></div>
-              <span className="soft-icon"><ClipboardPlus size={19} /></span>
+          ) : (
+            <div className="table-scroll">
+              <table className="data-table reports-table reports-table--wide">
+                <thead>
+                  <tr>
+                    <th>Paciente</th>
+                    <th>Tutor</th>
+                    <th>Veterinário</th>
+                    <th>Consulta</th>
+                    <th>Status</th>
+                    <th>Diagnóstico</th>
+                    <th>Observações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {historico.map((item) => (
+                    <tr key={item.idConsulta}>
+                      <td>
+                        <strong>{item.paciente}</strong>
+                        <small>
+                          {item.especie}
+                          {item.raca ? ` • ${item.raca}` : ''}
+                          {item.peso ? ` • ${formatarPeso(item.peso)}` : ''}
+                          {item.dataNascimento ? ` • Nasc. ${formatarData(item.dataNascimento)}` : ''}
+                        </small>
+                      </td>
+                      <td>
+                        <strong>{item.tutor || '—'}</strong>
+                        <small>{item.tutorCpf || 'CPF não informado'}</small>
+                      </td>
+                      <td>
+                        <strong>{item.veterinario}</strong>
+                        <small>{item.veterinarioCpf}</small>
+                      </td>
+                      <td>{formatarDataHora(item.dataConsulta)}</td>
+                      <td>{item.status}</td>
+                      <td>{item.diagnostico || '—'}</td>
+                      <td>{item.observacoes || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            {historico.length === 0 ? <p>Nenhum atendimento registrado ainda.</p> : (
-              <div className="table-scroll">
-                <table className="data-table">
-                  <thead><tr><th>Paciente</th><th>Espécie</th><th>Data</th><th>Diagnóstico</th><th>Veterinário</th></tr></thead>
-                  <tbody>
-                    {historico.map((item, index) => (
-                      <tr key={index}>
-                        <td>{item.paciente}</td>
-                        <td>{item.especie}</td>
-                        <td>{formatarDataHora(item.dataAtendimento)}</td>
-                        <td>{item.diagnostico}</td>
-                        <td>{item.veterinarioResponsavel}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </section>
-        </div>
+          )}
+        </section>
       )}
     </div>
   )

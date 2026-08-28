@@ -55,7 +55,7 @@ a.nav-item:hover { color: #fff; background: rgba(255,255,255,.06); }
 .nav-item--disabled { cursor: default; color: #779691; }
 .nav-item small { margin-left: auto; padding: 3px 5px; color: #789792; border: 1px solid rgba(158,193,187,.16); border-radius: 4px; font-size: 8px; font-weight: 750; letter-spacing: .45px; text-transform: uppercase; }
 .main-area { min-height: 100vh; margin-left: 258px; }
-.topbar { height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 38px; background: rgba(255,255,255,.93); border-bottom: 1px solid var(--line); }
+.topbar { height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 44px; background: rgba(255,255,255,.93); border-bottom: 1px solid var(--line); }
 .topbar__system { display: flex; align-items: center; gap: 9px; color: #71807e; font-size: 12px; font-weight: 650; letter-spacing: .15px; }
 .topbar__system-icon { display: grid; place-items: center; width: 29px; height: 29px; color: var(--primary); background: #e8f3ef; border-radius: 8px; }
 .user-chip { display: flex; align-items: center; gap: 9px; }
@@ -64,13 +64,13 @@ a.nav-item:hover { color: #fff; background: rgba(255,255,255,.06); }
 .user-chip strong { font-size: 11.5px; }
 .user-chip small { margin-top: 2px; color: #8a9694; font-size: 9.5px; }
 .menu-button { display: none !important; }
-.page-container { width: min(100%, 1430px); margin: 0 auto; padding: 34px 40px 55px; }
+.page-container { width: min(100%, 1480px); margin: 0 auto; padding: 38px 56px 64px; }
 
 h1, h2, h3, p { margin-top: 0; }
 h1 { margin-bottom: 8px; color: #1e3231; font-size: clamp(30px, 3vw, 39px); font-weight: 500; letter-spacing: -1.2px; }
 h2 { color: #293a39; font-size: 21px; font-weight: 500; letter-spacing: -.25px; }
 .eyebrow { margin-bottom: 8px; color: var(--primary); font-size: 9.5px; font-weight: 850; letter-spacing: 1.35px; text-transform: uppercase; }
-.page-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 25px; margin-bottom: 26px; }
+.page-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 25px; margin-bottom: 30px; }
 .page-header > div > p:last-child { margin: 0; color: var(--muted); font-size: 13px; }
 .page-header--compact { margin-bottom: 23px; }
 .back-link { display: inline-flex; align-items: center; gap: 4px; margin-bottom: 23px; color: #657572; font-size: 12px; font-weight: 650; transition: color .15s; }
@@ -139,8 +139,19 @@ a.module-card:hover { border-color: #c4d8d2; box-shadow: var(--shadow); transfor
 
 .content-card { background: #fff; border: 1px solid #e4e8e4; border-radius: 12px; box-shadow: 0 6px 22px rgba(29,52,49,.035); }
 .reports-list { display: grid; gap: 24px; }
+.reports-filter-card { margin-bottom: 22px; padding: 22px 24px; }
+.reports-filter-grid { display: grid; grid-template-columns: minmax(180px, 1.2fr) repeat(2, minmax(160px, 1fr)) auto; gap: 16px; align-items: end; }
+.reports-filter-actions { display: flex; gap: 10px; justify-content: flex-end; }
+.reports-filter-actions .button { min-width: 168px; }
+.reports-table { min-width: 760px; }
+.reports-table--wide { min-width: 1400px; }
 .reports-list .card-heading { padding: 22px 24px 18px; }
 .reports-empty-message { margin: 0; padding: 22px 24px; color: var(--muted); }
+.reports-filter-card,
+.reports-filter-card .field,
+.reports-filter-card .field > span {
+  overflow: visible;
+}
 .list-card { overflow: hidden; }
 .list-toolbar { min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 15px 19px; border-bottom: 1px solid #e9ece9; }
 .search-box { width: min(455px, 70%); height: 40px; display: flex; align-items: center; gap: 9px; padding: 0 11px; color: #8c9997; background: #f7f8f5; border: 1px solid #e2e7e2; border-radius: 8px; transition: border-color .15s, box-shadow .15s; }
@@ -213,8 +224,17 @@ a.module-card:hover { border-color: #c4d8d2; box-shadow: var(--shadow); transfor
 .patient-hero .button--danger-ghost { color: #f5c1c1; background: rgba(255,255,255,.05); border-color: rgba(255,193,193,.25); }
 .details-layout { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(260px, .7fr); gap: 18px; }
 .details-card, .tutor-card, .clinical-summary { padding: 25px 27px; }
-.card-heading { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding-bottom: 18px; border-bottom: 1px solid #e9ede9; }
+.card-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 15px; padding-bottom: 18px; border-bottom: 1px solid #e9ede9; }
+.card-heading > div { min-width: 0; flex: 1; }
 .card-heading h2 { margin-bottom: 0; }
+.card-heading .eyebrow,
+.card-heading h2 {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.card-heading .soft-icon {
+  flex: 0 0 auto;
+}
 .details-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0; margin: 0; }
 .details-grid > div { min-height: 75px; display: flex; flex-direction: column; justify-content: center; border-bottom: 1px solid #edf0ed; }
 .details-grid > div:nth-last-child(-n+2) { border-bottom: 0; }
@@ -252,6 +272,40 @@ a.module-card:hover { border-color: #c4d8d2; box-shadow: var(--shadow); transfor
 .modal-backdrop { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 20px; background: rgba(14,36,35,.55); backdrop-filter: blur(3px); animation: fade-in .15s ease; }
 .confirm-dialog { width: min(100%, 420px); padding: 25px; background: #fff; border-radius: 13px; box-shadow: 0 25px 70px rgba(13,37,35,.25); animation: modal-in .18s ease; }
 .confirm-dialog__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+
+@media (max-width: 960px) {
+  .topbar {
+    padding: 0 20px;
+  }
+
+  .page-container {
+    padding: 28px 20px 42px;
+  }
+
+  .page-header {
+    gap: 16px;
+  }
+
+  .content-card,
+  .list-card,
+  .recent-panel,
+  .details-card,
+  .tutor-card,
+  .clinical-summary {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .data-table th:first-child,
+  .data-table td:first-child {
+    padding-left: 18px;
+  }
+
+  .data-table th:last-child,
+  .data-table td:last-child {
+    padding-right: 18px;
+  }
+}
 .confirm-dialog__icon { display: grid; place-items: center; width: 43px; height: 43px; color: #b64747; background: #fff0f0; border-radius: 11px; }
 .confirm-dialog h2 { margin-bottom: 8px; font-size: 23px; }
 .confirm-dialog p { color: #788582; font-size: 11.5px; line-height: 1.55; }
@@ -279,6 +333,8 @@ a.module-card:hover { border-color: #c4d8d2; box-shadow: var(--shadow); transfor
   .page-container { padding-right: 27px; padding-left: 27px; }
   .module-grid { grid-template-columns: repeat(2, 1fr); }
   .module-card { min-height: 142px; }
+  .reports-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .reports-filter-actions { grid-column: 1 / -1; justify-content: flex-start; }
 }
 
 @media (max-width: 850px) {
@@ -311,6 +367,16 @@ a.module-card:hover { border-color: #c4d8d2; box-shadow: var(--shadow); transfor
   .recent-item { grid-template-columns: auto 1fr auto; }
   .recent-item__tutor { display: none; }
   .recent-panel { padding-right: 17px; padding-left: 17px; }
+  .reports-filter-card { padding: 18px; }
+  .reports-filter-grid { grid-template-columns: 1fr; }
+  .reports-filter-actions { flex-direction: column; }
+  .reports-filter-actions .button { width: 100%; }
+  .card-heading {
+    gap: 12px;
+  }
+  .card-heading .soft-icon {
+    display: none;
+  }
   .list-toolbar { align-items: stretch; flex-direction: column; gap: 9px; }
   .search-box { width: 100%; }
   .result-count { padding-left: 2px; }
@@ -332,4 +398,23 @@ a.module-card:hover { border-color: #c4d8d2; box-shadow: var(--shadow); transfor
   .details-grid > div:nth-last-child(2) { border-bottom: 1px solid #edf0ed; }
   .details-card, .tutor-card, .clinical-summary { padding: 22px; }
   .toast-container { top: 73px; right: 10px; }
+}
+.content-card,
+.list-card,
+.recent-panel,
+.details-card,
+.tutor-card,
+.clinical-summary {
+  padding-left: 30px;
+  padding-right: 30px;
+}
+
+.data-table th:first-child,
+.data-table td:first-child {
+  padding-left: 28px;
+}
+
+.data-table th:last-child,
+.data-table td:last-child {
+  padding-right: 24px;
 }
