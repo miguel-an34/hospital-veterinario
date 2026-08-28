@@ -64,3 +64,28 @@ Para validar o povoamento em um ambiente limpo (removendo o volume existente e r
 docker compose down -v
 docker compose up -d
 ```
+### Documentação de Gatilhos (Triggers)
+
+**Regra de Negócio Automatizada:**
+O gatilho `trg_atualiza_status_consulta` automatiza o encerramento do fluxo de atendimento médico. Na regra de negócio da clínica, assim que o veterinário finaliza o atendimento e insere as anotações no prontuário do paciente (tabela `RegistroClinico`), a consulta correspondente não pode mais permanecer em aberto. O SGBD assume essa responsabilidade: ele intercepta a inserção do prontuário e atualiza automaticamente o campo `status` da tabela `Consulta` correspondente para "Concluída". Isso garante consistência nos dados sem depender de requisições extras do back-end.
+
+**Como Testar:**
+Para validar o funcionamento do gatilho, execute os comandos SQL abaixo em sequência:
+
+1. Verifique o status atual de uma consulta que ainda não possui prontuário (ex: Consulta ID 35):
+```sql
+SELECT id_consulta, status FROM Consulta WHERE id_consulta = 35;
+```
+*(O resultado esperado no status é "Em andamento")*
+
+2. Simule a ação do veterinário inserindo um novo registro clínico vinculado a esta consulta:
+```sql
+INSERT INTO RegistroClinico (descricao, data_registro, consulta_id) 
+VALUES ('Avaliação clínica finalizada com sucesso.', CURRENT_DATE, 35);
+```
+
+3. Consulte a tabela de consultas novamente para verificar a automação:
+```sql
+SELECT id_consulta, status FROM Consulta WHERE id_consulta = 35;
+```
+*(O SGBD terá alterado automaticamente o status para "Concluída")*
