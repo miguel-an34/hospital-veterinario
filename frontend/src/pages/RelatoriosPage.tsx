@@ -21,7 +21,55 @@ export function RelatoriosPage() {
     dataFim: dataFim || undefined,
   }), [dataFim, dataInicio])
 
+  const relatorioVazio = tipo === 'atendimentos' ? atendimentos.length === 0 : historico.length === 0
+
+  const resumo = useMemo(() => {
+    if (tipo === 'atendimentos') {
+      return [
+        { label: 'Linhas no relatório', value: atendimentos.length.toLocaleString('pt-BR') },
+        { label: 'Atendimentos', value: atendimentos.reduce((total, item) => total + item.quantidadeAtendimentos, 0).toLocaleString('pt-BR') },
+        { label: 'Profissionais', value: new Set(atendimentos.map((item) => item.veterinarioCpf)).size.toLocaleString('pt-BR') },
+        { label: 'Faturamento', value: formatarMoeda(atendimentos.reduce((total, item) => total + item.faturamentoTotal, 0)) },
+      ]
+    }
+
+    return [
+      { label: 'Consultas', value: historico.length.toLocaleString('pt-BR') },
+      { label: 'Pacientes', value: new Set(historico.map((item) => item.idAnimal)).size.toLocaleString('pt-BR') },
+      { label: 'Veterinários', value: new Set(historico.map((item) => item.veterinarioCpf)).size.toLocaleString('pt-BR') },
+      { label: 'Com registro clínico', value: historico.filter((item) => Boolean(item.diagnostico)).length.toLocaleString('pt-BR') },
+    ]
+  }, [atendimentos, historico, tipo])
+
+  const invalidarResultado = () => {
+    setHasGenerated(false)
+    setAtendimentos([])
+    setHistorico([])
+    setError('')
+  }
+
+  const alterarTipo = (novoTipo: TipoRelatorio) => {
+    setTipo(novoTipo)
+    invalidarResultado()
+  }
+
+  const alterarDataInicio = (value: string) => {
+    setDataInicio(value)
+    invalidarResultado()
+  }
+
+  const alterarDataFim = (value: string) => {
+    setDataFim(value)
+    invalidarResultado()
+  }
+
   const gerarRelatorio = async () => {
+    if (dataInicio && dataFim && dataInicio > dataFim) {
+      setHasGenerated(false)
+      setError('A data inicial não pode ser posterior à data final.')
+      return
+    }
+
     setLoading(true)
     setError('')
     try {
@@ -43,6 +91,8 @@ export function RelatoriosPage() {
   }
 
   const exportarCsv = async () => {
+    if (!hasGenerated || relatorioVazio) return
+
     setExporting(true)
     setError('')
     try {
@@ -62,8 +112,6 @@ export function RelatoriosPage() {
     }
   }
 
-  const relatorioVazio = tipo === 'atendimentos' ? atendimentos.length === 0 : historico.length === 0
-
   return (
     <div>
       <header className="page-header">
@@ -78,7 +126,7 @@ export function RelatoriosPage() {
         <div className="reports-filter-grid">
           <label className="field">
             <span>Relatório</span>
-            <select value={tipo} onChange={(event) => setTipo(event.target.value as TipoRelatorio)}>
+            <select value={tipo} onChange={(event) => alterarTipo(event.target.value as TipoRelatorio)}>
               <option value="atendimentos">Atendimentos</option>
               <option value="historico">Histórico por paciente</option>
             </select>
@@ -86,12 +134,12 @@ export function RelatoriosPage() {
 
           <label className="field">
             <span>Data inicial</span>
-            <input type="date" value={dataInicio} onChange={(event) => setDataInicio(event.target.value)} />
+            <input type="date" value={dataInicio} max={dataFim || undefined} onChange={(event) => alterarDataInicio(event.target.value)} />
           </label>
 
           <label className="field">
             <span>Data final</span>
-            <input type="date" value={dataFim} onChange={(event) => setDataFim(event.target.value)} />
+            <input type="date" value={dataFim} min={dataInicio || undefined} onChange={(event) => alterarDataFim(event.target.value)} />
           </label>
 
           <div className="reports-filter-actions">
@@ -99,7 +147,7 @@ export function RelatoriosPage() {
               {loading ? <span className="button-spinner" /> : <FileBarChart2 size={16} />}
               <span>Gerar Relatório</span>
             </button>
-            <button className="button button--secondary" onClick={exportarCsv} disabled={loading || exporting}>
+            <button className="button button--secondary" onClick={exportarCsv} disabled={loading || exporting || !hasGenerated || relatorioVazio}>
               {exporting ? <span className="button-spinner" /> : <Download size={16} />}
               <span>Baixar CSV</span>
             </button>
@@ -127,7 +175,17 @@ export function RelatoriosPage() {
           <p>Ajuste o tipo de relatório ou o período informado e gere novamente.</p>
         </section>
       ) : (
-        <section className="content-card list-card">
+        <div className="reports-result">
+          <section className="reports-summary-grid" aria-label="Resumo do relatório">
+            {resumo.map((item) => (
+              <article className="content-card reports-summary-card" key={item.label}>
+                <span>{item.label}</span>
+                <strong>{item.value}</strong>
+              </article>
+            ))}
+          </section>
+
+          <section className="content-card list-card">
           <div className="card-heading">
             <div>
               <p className="eyebrow">{tipo === 'atendimentos' ? 'Resumo financeiro e volume' : 'Prontuário consolidado'}</p>
@@ -206,7 +264,8 @@ export function RelatoriosPage() {
               </table>
             </div>
           )}
-        </section>
+          </section>
+        </div>
       )}
     </div>
   )

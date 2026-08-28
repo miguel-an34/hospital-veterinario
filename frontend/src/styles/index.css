@@ -143,9 +143,15 @@ a.module-card:hover { border-color: #c4d8d2; box-shadow: var(--shadow); transfor
 .reports-filter-grid { display: grid; grid-template-columns: minmax(180px, 1.2fr) repeat(2, minmax(160px, 1fr)) auto; gap: 16px; align-items: end; }
 .reports-filter-actions { display: flex; gap: 10px; justify-content: flex-end; }
 .reports-filter-actions .button { min-width: 168px; }
+.reports-result { display: grid; gap: 18px; }
+.reports-summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 13px; }
+.reports-summary-card { min-height: 96px; display: flex; flex-direction: column; justify-content: center; padding: 18px 21px; }
+.reports-summary-card span { margin-bottom: 7px; color: #7f8d8a; font-size: 9.5px; font-weight: 750; letter-spacing: .55px; text-transform: uppercase; }
+.reports-summary-card strong { overflow-wrap: anywhere; color: #27413e; font-size: clamp(20px, 2vw, 27px); font-weight: 550; letter-spacing: -.5px; }
 .reports-table { min-width: 760px; }
 .reports-table--wide { min-width: 1400px; }
-.reports-list .card-heading { padding: 22px 24px 18px; }
+.reports-list .card-heading,
+.reports-result .card-heading { padding: 22px 24px 18px; }
 .reports-empty-message { margin: 0; padding: 22px 24px; color: var(--muted); }
 .reports-filter-card,
 .reports-filter-card .field,
@@ -335,6 +341,7 @@ a.module-card:hover { border-color: #c4d8d2; box-shadow: var(--shadow); transfor
   .module-card { min-height: 142px; }
   .reports-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .reports-filter-actions { grid-column: 1 / -1; justify-content: flex-start; }
+  .reports-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 850px) {
@@ -371,6 +378,7 @@ a.module-card:hover { border-color: #c4d8d2; box-shadow: var(--shadow); transfor
   .reports-filter-grid { grid-template-columns: 1fr; }
   .reports-filter-actions { flex-direction: column; }
   .reports-filter-actions .button { width: 100%; }
+  .reports-summary-grid { grid-template-columns: 1fr; }
   .card-heading {
     gap: 12px;
   }
