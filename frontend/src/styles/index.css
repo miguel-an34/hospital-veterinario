@@ -150,6 +150,9 @@ a.module-card:hover { border-color: #c4d8d2; box-shadow: var(--shadow); transfor
 .reports-summary-card strong { overflow-wrap: anywhere; color: #27413e; font-size: clamp(20px, 2vw, 27px); font-weight: 550; letter-spacing: -.5px; }
 .reports-table { min-width: 760px; }
 .reports-table--wide { min-width: 1400px; }
+.report-status { display: inline-flex; align-items: center; padding: 5px 9px; border-radius: 20px; font-size: 9px; font-weight: 750; }
+.report-status--done { color: #287267; background: #e7f4f0; }
+.report-status--pending { color: #9a6c2c; background: #fbf1de; }
 .reports-list .card-heading,
 .reports-result .card-heading { padding: 22px 24px 18px; }
 .reports-empty-message { margin: 0; padding: 22px 24px; color: var(--muted); }

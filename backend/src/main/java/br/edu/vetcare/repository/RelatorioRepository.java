@@ -7,7 +7,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 import br.edu.vetcare.dto.relatorio.AgendaDiariaView;
+import br.edu.vetcare.dto.relatorio.AgendaPorPeriodoView;
 import br.edu.vetcare.dto.relatorio.AtendimentoPorProfissionalView;
+import br.edu.vetcare.dto.relatorio.ExameRelatorioView;
 import br.edu.vetcare.dto.relatorio.HistoricoClinicoView;
 import br.edu.vetcare.dto.relatorio.HistoricoPorPacienteView;
 import br.edu.vetcare.dto.relatorio.InternacaoAtivaView;
@@ -40,6 +42,32 @@ public class RelatorioRepository {
                     rs.getString("motivo"),
                     rs.getString("paciente"),
                     rs.getString("tutor"));
+
+    private static final RowMapper<AgendaPorPeriodoView> AGENDA_PERIODO_MAPPER = (rs, rowNum) ->
+            new AgendaPorPeriodoView(
+                    rs.getInt("id_agendamento"),
+                    rs.getDate("data").toLocalDate(),
+                    rs.getTime("horario").toLocalTime(),
+                    rs.getString("motivo"),
+                    rs.getInt("id_animal"),
+                    rs.getString("paciente"),
+                    rs.getString("tutor_cpf"),
+                    rs.getString("tutor"));
+
+    private static final RowMapper<ExameRelatorioView> EXAME_RELATORIO_MAPPER = (rs, rowNum) -> {
+        Date dataResultado = rs.getDate("data_resultado");
+        return new ExameRelatorioView(
+                rs.getInt("id_exame"),
+                rs.getString("tipo"),
+                rs.getString("resultado"),
+                rs.getString("observacoes"),
+                rs.getDate("data_solicitacao").toLocalDate(),
+                dataResultado == null ? null : dataResultado.toLocalDate(),
+                rs.getInt("id_consulta"),
+                rs.getInt("id_animal"),
+                rs.getString("paciente"),
+                rs.getString("veterinario"));
+    };
 
     private static final RowMapper<AtendimentoPorProfissionalView> ATENDIMENTO_ANALITICO_MAPPER = (rs, rowNum) ->
             new AtendimentoPorProfissionalView(
@@ -91,6 +119,71 @@ public class RelatorioRepository {
     public List<AgendaDiariaView> agendaDiaria() {
         return jdbcClient.sql("SELECT * FROM v_agenda_diaria")
                 .query(AGENDA_DIARIA_MAPPER).list();
+    }
+
+    public List<InternacaoAtivaView> internacoesAtivasPorPeriodo(LocalDate dataInicio, LocalDate dataFim) {
+        return jdbcClient.sql("""
+                SELECT *
+                FROM v_internacoes_ativas
+                WHERE (:dataInicio IS NULL OR DATE(data_entrada) >= :dataInicio)
+                  AND (:dataFim IS NULL OR DATE(data_entrada) <= :dataFim)
+                ORDER BY data_entrada, leito
+                """)
+                .param("dataInicio", dataInicio)
+                .param("dataFim", dataFim)
+                .query(INTERNACAO_ATIVA_MAPPER)
+                .list();
+    }
+
+    public List<AgendaPorPeriodoView> agendaPorPeriodo(LocalDate dataInicio, LocalDate dataFim) {
+        return jdbcClient.sql("""
+                SELECT
+                    ag.id_agendamento,
+                    ag.data,
+                    ag.horario,
+                    ag.motivo,
+                    a.id_animal,
+                    a.nome AS paciente,
+                    ag.tutor_cpf,
+                    u.nome AS tutor
+                FROM Agendamento ag
+                JOIN Animal a ON a.id_animal = ag.animal_id
+                JOIN Usuario u ON u.cpf = ag.tutor_cpf
+                WHERE (:dataInicio IS NULL OR ag.data >= :dataInicio)
+                  AND (:dataFim IS NULL OR ag.data <= :dataFim)
+                ORDER BY ag.data DESC, ag.horario, paciente
+                """)
+                .param("dataInicio", dataInicio)
+                .param("dataFim", dataFim)
+                .query(AGENDA_PERIODO_MAPPER)
+                .list();
+    }
+
+    public List<ExameRelatorioView> examesPorPeriodo(LocalDate dataInicio, LocalDate dataFim) {
+        return jdbcClient.sql("""
+                SELECT
+                    e.id_exame,
+                    e.tipo,
+                    e.resultado,
+                    e.observacoes,
+                    e.data_solicitacao,
+                    e.data_resultado,
+                    con.id_consulta,
+                    a.id_animal,
+                    a.nome AS paciente,
+                    u.nome AS veterinario
+                FROM Exame e
+                JOIN Consulta con ON con.id_consulta = e.consulta_id
+                JOIN Animal a ON a.id_animal = con.animal_id
+                JOIN Usuario u ON u.cpf = con.veterinario_cpf
+                WHERE (:dataInicio IS NULL OR e.data_solicitacao >= :dataInicio)
+                  AND (:dataFim IS NULL OR e.data_solicitacao <= :dataFim)
+                ORDER BY e.data_solicitacao DESC, e.id_exame DESC
+                """)
+                .param("dataInicio", dataInicio)
+                .param("dataFim", dataFim)
+                .query(EXAME_RELATORIO_MAPPER)
+                .list();
     }
 
     public List<AtendimentoPorProfissionalView> atendimentosPorPeriodo(LocalDate dataInicio, LocalDate dataFim) {

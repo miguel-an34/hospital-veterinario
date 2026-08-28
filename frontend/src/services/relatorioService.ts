@@ -1,7 +1,9 @@
 import { apiRequest } from './apiClient'
 import type {
   AgendaDiaria,
+  AgendaPorPeriodo,
   AtendimentoPorProfissional,
+  ExameRelatorio,
   HistoricoClinico,
   HistoricoPorPaciente,
   InternacaoAtiva,
@@ -31,6 +33,12 @@ export const relatorioService = {
     apiRequest<AtendimentoPorProfissional[]>(`/api/relatorios/atendimentos${buildQuery(filtros)}`),
   historico: (filtros: RelatorioFiltros) =>
     apiRequest<HistoricoPorPaciente[]>(`/api/relatorios/historico${buildQuery(filtros)}`),
+  internacoes: (filtros: RelatorioFiltros) =>
+    apiRequest<InternacaoAtiva[]>(`/api/relatorios/internacoes${buildQuery(filtros)}`),
+  exames: (filtros: RelatorioFiltros) =>
+    apiRequest<ExameRelatorio[]>(`/api/relatorios/exames${buildQuery(filtros)}`),
+  agenda: (filtros: RelatorioFiltros) =>
+    apiRequest<AgendaPorPeriodo[]>(`/api/relatorios/agenda${buildQuery(filtros)}`),
   async exportarCsv(tipo: TipoRelatorio, filtros: RelatorioFiltros) {
     const response = await fetch(`${API_URL}/api/relatorios/${tipo}/csv${buildQuery(filtros)}`)
     if (!response.ok) {

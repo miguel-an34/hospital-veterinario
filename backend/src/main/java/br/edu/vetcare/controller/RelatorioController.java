@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 import br.edu.vetcare.dto.relatorio.AgendaDiariaView;
+import br.edu.vetcare.dto.relatorio.AgendaPorPeriodoView;
 import br.edu.vetcare.dto.relatorio.AtendimentoPorProfissionalView;
+import br.edu.vetcare.dto.relatorio.ExameRelatorioView;
 import br.edu.vetcare.dto.relatorio.HistoricoClinicoView;
 import br.edu.vetcare.dto.relatorio.HistoricoPorPacienteView;
 import br.edu.vetcare.dto.relatorio.InternacaoAtivaView;
@@ -36,6 +38,33 @@ public class RelatorioController {
 
     @GetMapping("/agenda-diaria")
     public List<AgendaDiariaView> agendaDiaria() { return service.agendaDiaria(); }
+
+    @GetMapping("/internacoes")
+    public List<InternacaoAtivaView> internacoes(
+            @RequestParam(name = "data_inicio", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+            @RequestParam(name = "data_fim", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim) {
+        return service.internacoes(dataInicio, dataFim);
+    }
+
+    @GetMapping("/agenda")
+    public List<AgendaPorPeriodoView> agenda(
+            @RequestParam(name = "data_inicio", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+            @RequestParam(name = "data_fim", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim) {
+        return service.agenda(dataInicio, dataFim);
+    }
+
+    @GetMapping("/exames")
+    public List<ExameRelatorioView> exames(
+            @RequestParam(name = "data_inicio", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+            @RequestParam(name = "data_fim", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim) {
+        return service.exames(dataInicio, dataFim);
+    }
 
     @GetMapping("/atendimentos")
     public List<AtendimentoPorProfissionalView> atendimentos(
@@ -77,5 +106,41 @@ public class RelatorioController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=relatorio-historico.csv")
                 .contentType(MediaType.parseMediaType("text/csv; charset=UTF-8"))
                 .body(service.exportarHistoricoCsv(dataInicio, dataFim));
+    }
+
+    @GetMapping(value = "/internacoes/csv", produces = "text/csv; charset=UTF-8")
+    public ResponseEntity<byte[]> exportarInternacoesCsv(
+            @RequestParam(name = "data_inicio", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+            @RequestParam(name = "data_fim", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim) {
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=relatorio-internacoes-ativas.csv")
+                .contentType(MediaType.parseMediaType("text/csv; charset=UTF-8"))
+                .body(service.exportarInternacoesCsv(dataInicio, dataFim));
+    }
+
+    @GetMapping(value = "/agenda/csv", produces = "text/csv; charset=UTF-8")
+    public ResponseEntity<byte[]> exportarAgendaCsv(
+            @RequestParam(name = "data_inicio", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+            @RequestParam(name = "data_fim", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim) {
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=relatorio-agenda.csv")
+                .contentType(MediaType.parseMediaType("text/csv; charset=UTF-8"))
+                .body(service.exportarAgendaCsv(dataInicio, dataFim));
+    }
+
+    @GetMapping(value = "/exames/csv", produces = "text/csv; charset=UTF-8")
+    public ResponseEntity<byte[]> exportarExamesCsv(
+            @RequestParam(name = "data_inicio", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+            @RequestParam(name = "data_fim", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim) {
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=relatorio-exames.csv")
+                .contentType(MediaType.parseMediaType("text/csv; charset=UTF-8"))
+                .body(service.exportarExamesCsv(dataInicio, dataFim));
     }
 }

@@ -5,7 +5,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 import br.edu.vetcare.dto.relatorio.AgendaDiariaView;
+import br.edu.vetcare.dto.relatorio.AgendaPorPeriodoView;
 import br.edu.vetcare.dto.relatorio.AtendimentoPorProfissionalView;
+import br.edu.vetcare.dto.relatorio.ExameRelatorioView;
 import br.edu.vetcare.dto.relatorio.HistoricoClinicoView;
 import br.edu.vetcare.dto.relatorio.HistoricoPorPacienteView;
 import br.edu.vetcare.dto.relatorio.InternacaoAtivaView;
@@ -31,6 +33,21 @@ public class RelatorioService {
 
     public List<AgendaDiariaView> agendaDiaria() {
         return repository.agendaDiaria();
+    }
+
+    public List<InternacaoAtivaView> internacoes(LocalDate dataInicio, LocalDate dataFim) {
+        validarPeriodo(dataInicio, dataFim);
+        return repository.internacoesAtivasPorPeriodo(dataInicio, dataFim);
+    }
+
+    public List<AgendaPorPeriodoView> agenda(LocalDate dataInicio, LocalDate dataFim) {
+        validarPeriodo(dataInicio, dataFim);
+        return repository.agendaPorPeriodo(dataInicio, dataFim);
+    }
+
+    public List<ExameRelatorioView> exames(LocalDate dataInicio, LocalDate dataFim) {
+        validarPeriodo(dataInicio, dataFim);
+        return repository.examesPorPeriodo(dataInicio, dataFim);
     }
 
     public List<AtendimentoPorProfissionalView> atendimentos(LocalDate dataInicio, LocalDate dataFim) {
@@ -81,6 +98,63 @@ public class RelatorioService {
                     item.status(),
                     item.observacoes(),
                     item.diagnostico());
+        }
+        return csv.toString().getBytes(StandardCharsets.UTF_8);
+    }
+
+    public byte[] exportarInternacoesCsv(LocalDate dataInicio, LocalDate dataFim) {
+        List<InternacaoAtivaView> itens = internacoes(dataInicio, dataFim);
+        StringBuilder csv = new StringBuilder("leito,paciente,data_entrada,tutor_responsavel,observacoes\n");
+        for (InternacaoAtivaView item : itens) {
+            appendRow(csv,
+                    item.leito(),
+                    item.paciente(),
+                    item.dataEntrada(),
+                    item.tutorResponsavel(),
+                    item.observacoes());
+        }
+        return csv.toString().getBytes(StandardCharsets.UTF_8);
+    }
+
+    public byte[] exportarAgendaCsv(LocalDate dataInicio, LocalDate dataFim) {
+        List<AgendaPorPeriodoView> itens = agenda(dataInicio, dataFim);
+        StringBuilder csv = new StringBuilder(
+                "id_agendamento,data,horario,motivo,id_animal,paciente,tutor_cpf,tutor\n");
+        for (AgendaPorPeriodoView item : itens) {
+            appendRow(csv,
+                    item.idAgendamento(),
+                    item.data(),
+                    item.horario(),
+                    item.motivo(),
+                    item.idAnimal(),
+                    item.paciente(),
+                    item.tutorCpf(),
+                    item.tutor());
+        }
+        return csv.toString().getBytes(StandardCharsets.UTF_8);
+    }
+
+    public byte[] exportarExamesCsv(LocalDate dataInicio, LocalDate dataFim) {
+        List<ExameRelatorioView> itens = exames(dataInicio, dataFim);
+        StringBuilder csv = new StringBuilder(
+                "id_exame,tipo,situacao,resultado,observacoes,data_solicitacao,data_resultado,"
+                        + "id_consulta,id_animal,paciente,veterinario\n");
+        for (ExameRelatorioView item : itens) {
+            boolean concluido = item.dataResultado() != null
+                    && item.resultado() != null
+                    && !item.resultado().isBlank();
+            appendRow(csv,
+                    item.idExame(),
+                    item.tipo(),
+                    concluido ? "Concluído" : "Pendente",
+                    item.resultado(),
+                    item.observacoes(),
+                    item.dataSolicitacao(),
+                    item.dataResultado(),
+                    item.idConsulta(),
+                    item.idAnimal(),
+                    item.paciente(),
+                    item.veterinario());
         }
         return csv.toString().getBytes(StandardCharsets.UTF_8);
     }
