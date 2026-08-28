@@ -6,8 +6,23 @@ export function formatarData(data: string): string {
 
 export function formatarDataHora(dataHora: string): string {
   if (!dataHora) return 'Não informada'
-  const [data, horario = ''] = dataHora.split('T')
+  const normalizado = dataHora.replace(' ', 'T')
+  const [data, horario = ''] = normalizado.split('T')
   return `${formatarData(data)} às ${horario.slice(0, 5)}`
+}
+
+export function formatarCompetencia(ano: number, mes: number): string {
+  return new Intl.DateTimeFormat('pt-BR', {
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date(ano, mes - 1, 1))
+}
+
+export function formatarMoeda(valor: number): string {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(valor)
 }
 
 export function agoraParaInputDataHora(): string {
