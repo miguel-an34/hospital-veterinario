@@ -89,3 +89,17 @@ VALUES ('Avaliação clínica finalizada com sucesso.', CURRENT_DATE, 35);
 SELECT id_consulta, status FROM Consulta WHERE id_consulta = 35;
 ```
 *(O SGBD terá alterado automaticamente o status para "Concluída")*
+
+## Correções Aplicadas em Relação à Devolutiva Anterior
+
+A partir da revisão técnica recebida na entrega anterior, os seguintes pontos foram corrigidos no esquema do banco de dados:
+
+- **Restrições de domínio ausentes:** adicionados `CHECK (salario >= 0)` em `Funcionario` e `CHECK (peso >= 0)` em `Animal`, impedindo valores negativos.
+- **Duplicação em atributos multivalorados:** adicionadas as constraints `UNIQUE (usuario_cpf, numero)` em `Telefone` e `UNIQUE (animal_id, descricao)` em `Alergia`, impedindo duplicidade de telefones/alergias para o mesmo usuário/animal.
+- **Integridade do prontuário médico:** as chaves estrangeiras que antes usavam `ON DELETE CASCADE` na cadeia `Animal → Consulta`, `Consulta → RegistroClinico`, `Consulta → Exame` e `Animal → Internacao` foram alteradas para `ON DELETE RESTRICT`, impedindo a exclusão acidental de um animal ou de uma consulta que já possua histórico clínico associado.
+- **Valores arbitrários em `Consulta.status`:** o campo foi convertido de `VARCHAR(20)` livre para `ENUM('Agendada', 'Em andamento', 'Concluída', 'Cancelada')`, restringindo os valores possíveis.
+- **Consistência temporal:** adicionados `CHECK (data_alta >= data_entrada)` em `Internacao` e `CHECK (data_resultado >= data_solicitacao)` em `Exame`.
+- **Fragilidade da chave primária em `Internacao`:** o atributo `data_entrada` foi alterado de `DATE` para `DATETIME`, permitindo múltiplas internações do mesmo animal em datas iguais com horários distintos.
+- **Ausência de timestamp em `Consulta`:** adicionado o campo `data_hora DATETIME DEFAULT CURRENT_TIMESTAMP`, registrando o momento exato do atendimento.
+
+**Limitação conhecida:** a recomendação de complementar o `ON DELETE RESTRICT` com um mecanismo de exclusão lógica (soft delete, via flag `ativo`/`inativo`) não foi implementada nesta entrega, ficando como melhoria futura para o sistema.
