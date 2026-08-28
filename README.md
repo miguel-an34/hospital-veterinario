@@ -101,5 +101,3 @@ A partir da revisão técnica recebida na entrega anterior, os seguintes pontos 
 - **Consistência temporal:** adicionados `CHECK (data_alta >= data_entrada)` em `Internacao` e `CHECK (data_resultado >= data_solicitacao)` em `Exame`.
 - **Fragilidade da chave primária em `Internacao`:** o atributo `data_entrada` foi alterado de `DATE` para `DATETIME`, permitindo múltiplas internações do mesmo animal em datas iguais com horários distintos.
 - **Ausência de timestamp em `Consulta`:** adicionado o campo `data_hora DATETIME DEFAULT CURRENT_TIMESTAMP`, registrando o momento exato do atendimento.
-
-**Limitação conhecida:** a recomendação de complementar o `ON DELETE RESTRICT` com um mecanismo de exclusão lógica (soft delete, via flag `ativo`/`inativo`) não foi implementada nesta entrega, ficando como melhoria futura para o sistema.
