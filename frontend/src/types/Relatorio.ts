@@ -49,17 +49,6 @@ export interface AgendaDiaria {
   tutor: string
 }
 
-export interface AgendaPorPeriodo {
-  idAgendamento: number
-  data: string
-  horario: string
-  motivo: string
-  idAnimal: number
-  paciente: string
-  tutorCpf: string
-  tutor: string
-}
-
 export interface ExameRelatorio {
   idExame: number
   tipo: string
@@ -73,4 +62,4 @@ export interface ExameRelatorio {
   veterinario: string
 }
 
-export type TipoRelatorio = 'atendimentos' | 'historico' | 'internacoes' | 'exames' | 'agenda'
+export type TipoRelatorio = 'atendimentos' | 'historico' | 'internacoes' | 'exames' | 'agenda-diaria'

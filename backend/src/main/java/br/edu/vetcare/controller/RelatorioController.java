@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import br.edu.vetcare.dto.relatorio.AgendaDiariaView;
-import br.edu.vetcare.dto.relatorio.AgendaPorPeriodoView;
 import br.edu.vetcare.dto.relatorio.AtendimentoPorProfissionalView;
 import br.edu.vetcare.dto.relatorio.ExameRelatorioView;
 import br.edu.vetcare.dto.relatorio.HistoricoClinicoView;
@@ -46,15 +45,6 @@ public class RelatorioController {
             @RequestParam(name = "data_fim", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim) {
         return service.internacoes(dataInicio, dataFim);
-    }
-
-    @GetMapping("/agenda")
-    public List<AgendaPorPeriodoView> agenda(
-            @RequestParam(name = "data_inicio", required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
-            @RequestParam(name = "data_fim", required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim) {
-        return service.agenda(dataInicio, dataFim);
     }
 
     @GetMapping("/exames")
@@ -120,16 +110,12 @@ public class RelatorioController {
                 .body(service.exportarInternacoesCsv(dataInicio, dataFim));
     }
 
-    @GetMapping(value = "/agenda/csv", produces = "text/csv; charset=UTF-8")
-    public ResponseEntity<byte[]> exportarAgendaCsv(
-            @RequestParam(name = "data_inicio", required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
-            @RequestParam(name = "data_fim", required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim) {
+    @GetMapping(value = "/agenda-diaria/csv", produces = "text/csv; charset=UTF-8")
+    public ResponseEntity<byte[]> exportarAgendaDiariaCsv() {
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=relatorio-agenda.csv")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=relatorio-agenda-diaria.csv")
                 .contentType(MediaType.parseMediaType("text/csv; charset=UTF-8"))
-                .body(service.exportarAgendaCsv(dataInicio, dataFim));
+                .body(service.exportarAgendaDiariaCsv());
     }
 
     @GetMapping(value = "/exames/csv", produces = "text/csv; charset=UTF-8")

@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import br.edu.vetcare.dto.relatorio.AgendaDiariaView;
-import br.edu.vetcare.dto.relatorio.AgendaPorPeriodoView;
 import br.edu.vetcare.dto.relatorio.AtendimentoPorProfissionalView;
 import br.edu.vetcare.dto.relatorio.ExameRelatorioView;
 import br.edu.vetcare.dto.relatorio.HistoricoClinicoView;
@@ -38,11 +37,6 @@ public class RelatorioService {
     public List<InternacaoAtivaView> internacoes(LocalDate dataInicio, LocalDate dataFim) {
         validarPeriodo(dataInicio, dataFim);
         return repository.internacoesAtivasPorPeriodo(dataInicio, dataFim);
-    }
-
-    public List<AgendaPorPeriodoView> agenda(LocalDate dataInicio, LocalDate dataFim) {
-        validarPeriodo(dataInicio, dataFim);
-        return repository.agendaPorPeriodo(dataInicio, dataFim);
     }
 
     public List<ExameRelatorioView> exames(LocalDate dataInicio, LocalDate dataFim) {
@@ -116,19 +110,14 @@ public class RelatorioService {
         return csv.toString().getBytes(StandardCharsets.UTF_8);
     }
 
-    public byte[] exportarAgendaCsv(LocalDate dataInicio, LocalDate dataFim) {
-        List<AgendaPorPeriodoView> itens = agenda(dataInicio, dataFim);
-        StringBuilder csv = new StringBuilder(
-                "id_agendamento,data,horario,motivo,id_animal,paciente,tutor_cpf,tutor\n");
-        for (AgendaPorPeriodoView item : itens) {
+    public byte[] exportarAgendaDiariaCsv() {
+        List<AgendaDiariaView> itens = agendaDiaria();
+        StringBuilder csv = new StringBuilder("horario,motivo,paciente,tutor\n");
+        for (AgendaDiariaView item : itens) {
             appendRow(csv,
-                    item.idAgendamento(),
-                    item.data(),
                     item.horario(),
                     item.motivo(),
-                    item.idAnimal(),
                     item.paciente(),
-                    item.tutorCpf(),
                     item.tutor());
         }
         return csv.toString().getBytes(StandardCharsets.UTF_8);

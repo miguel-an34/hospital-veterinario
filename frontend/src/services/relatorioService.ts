@@ -1,7 +1,6 @@
 import { apiRequest } from './apiClient'
 import type {
   AgendaDiaria,
-  AgendaPorPeriodo,
   AtendimentoPorProfissional,
   ExameRelatorio,
   HistoricoClinico,
@@ -37,10 +36,9 @@ export const relatorioService = {
     apiRequest<InternacaoAtiva[]>(`/api/relatorios/internacoes${buildQuery(filtros)}`),
   exames: (filtros: RelatorioFiltros) =>
     apiRequest<ExameRelatorio[]>(`/api/relatorios/exames${buildQuery(filtros)}`),
-  agenda: (filtros: RelatorioFiltros) =>
-    apiRequest<AgendaPorPeriodo[]>(`/api/relatorios/agenda${buildQuery(filtros)}`),
   async exportarCsv(tipo: TipoRelatorio, filtros: RelatorioFiltros) {
-    const response = await fetch(`${API_URL}/api/relatorios/${tipo}/csv${buildQuery(filtros)}`)
+    const query = tipo === 'agenda-diaria' ? '' : buildQuery(filtros)
+    const response = await fetch(`${API_URL}/api/relatorios/${tipo}/csv${query}`)
     if (!response.ok) {
       let mensagem = `A exportação falhou (erro ${response.status}).`
       try {

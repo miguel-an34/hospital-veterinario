@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react'
 import { LoadingState } from '../components/LoadingState'
 import { relatorioService } from '../services/relatorioService'
 import type {
-  AgendaPorPeriodo,
+  AgendaDiaria,
   AtendimentoPorProfissional,
   ExameRelatorio,
   HistoricoPorPaciente,
@@ -17,7 +17,7 @@ const relatoriosMeta: Record<TipoRelatorio, { eyebrow: string; titulo: string; a
   historico: { eyebrow: 'Prontuário consolidado', titulo: 'Histórico por paciente', arquivo: 'relatorio-historico.csv' },
   internacoes: { eyebrow: 'Ocupação hospitalar', titulo: 'Internações ativas', arquivo: 'relatorio-internacoes-ativas.csv' },
   exames: { eyebrow: 'Acompanhamento diagnóstico', titulo: 'Exames e resultados', arquivo: 'relatorio-exames.csv' },
-  agenda: { eyebrow: 'Planejamento de atendimentos', titulo: 'Agenda por período', arquivo: 'relatorio-agenda.csv' },
+  'agenda-diaria': { eyebrow: 'Planejamento do dia', titulo: 'Agenda diária', arquivo: 'relatorio-agenda-diaria.csv' },
 }
 
 const umDiaEmMs = 1000 * 60 * 60 * 24
@@ -34,7 +34,7 @@ export function RelatoriosPage() {
   const [historico, setHistorico] = useState<HistoricoPorPaciente[]>([])
   const [internacoes, setInternacoes] = useState<InternacaoAtiva[]>([])
   const [exames, setExames] = useState<ExameRelatorio[]>([])
-  const [agenda, setAgenda] = useState<AgendaPorPeriodo[]>([])
+  const [agenda, setAgenda] = useState<AgendaDiaria[]>([])
   const [loading, setLoading] = useState(false)
   const [exporting, setExporting] = useState(false)
   const [hasGenerated, setHasGenerated] = useState(false)
@@ -50,7 +50,7 @@ export function RelatoriosPage() {
     historico: historico.length,
     internacoes: internacoes.length,
     exames: exames.length,
-    agenda: agenda.length,
+    'agenda-diaria': agenda.length,
   }[tipo]
 
   const relatorioVazio = totalRegistros === 0
@@ -98,9 +98,9 @@ export function RelatoriosPage() {
     }
 
     return [
-      { label: 'Agendamentos', value: agenda.length.toLocaleString('pt-BR') },
-      { label: 'Pacientes', value: new Set(agenda.map((item) => item.idAnimal)).size.toLocaleString('pt-BR') },
-      { label: 'Dias com agenda', value: new Set(agenda.map((item) => item.data)).size.toLocaleString('pt-BR') },
+      { label: 'Agendamentos de hoje', value: agenda.length.toLocaleString('pt-BR') },
+      { label: 'Pacientes', value: new Set(agenda.map((item) => item.paciente)).size.toLocaleString('pt-BR') },
+      { label: 'Horários ocupados', value: new Set(agenda.map((item) => item.horario)).size.toLocaleString('pt-BR') },
       { label: 'Urgências', value: agenda.filter((item) => item.motivo.toLocaleLowerCase('pt-BR').includes('urgência')).length.toLocaleString('pt-BR') },
     ]
   }, [agenda, atendimentos, exames, historico, internacoes, tipo])
@@ -149,7 +149,7 @@ export function RelatoriosPage() {
       if (tipo === 'historico') setHistorico(await relatorioService.historico(filtros))
       if (tipo === 'internacoes') setInternacoes(await relatorioService.internacoes(filtros))
       if (tipo === 'exames') setExames(await relatorioService.exames(filtros))
-      if (tipo === 'agenda') setAgenda(await relatorioService.agenda(filtros))
+      if (tipo === 'agenda-diaria') setAgenda(await relatorioService.agendaDiaria())
       setHasGenerated(true)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Não foi possível carregar o relatório.')
@@ -264,12 +264,12 @@ export function RelatoriosPage() {
 
     return (
       <table className="data-table reports-table">
-        <thead><tr><th>Data e horário</th><th>Paciente</th><th>Tutor</th><th>Motivo</th></tr></thead>
-        <tbody>{agenda.map((item) => (
-          <tr key={item.idAgendamento}>
-            <td><strong>{formatarData(item.data)}</strong><small>{item.horario.slice(0, 5)} • Agendamento #{item.idAgendamento}</small></td>
-            <td><strong>{item.paciente}</strong><small>Paciente #{item.idAnimal}</small></td>
-            <td><strong>{item.tutor}</strong><small>CPF {item.tutorCpf}</small></td>
+        <thead><tr><th>Horário</th><th>Paciente</th><th>Tutor</th><th>Motivo</th></tr></thead>
+        <tbody>{agenda.map((item, index) => (
+          <tr key={`${item.horario}-${item.paciente}-${index}`}>
+            <td><strong>{item.horario.slice(0, 5)}</strong></td>
+            <td><strong>{item.paciente}</strong></td>
+            <td><strong>{item.tutor}</strong></td>
             <td>{item.motivo}</td>
           </tr>
         ))}</tbody>
@@ -296,18 +296,18 @@ export function RelatoriosPage() {
               <option value="historico">Histórico por paciente</option>
               <option value="internacoes">Internações ativas</option>
               <option value="exames">Exames e resultados</option>
-              <option value="agenda">Agenda por período</option>
+              <option value="agenda-diaria">Agenda diária</option>
             </select>
           </label>
 
           <label className="field">
             <span>Data inicial</span>
-            <input type="date" value={dataInicio} max={dataFim || undefined} onChange={(event) => alterarDataInicio(event.target.value)} />
+            <input type="date" value={dataInicio} max={dataFim || undefined} disabled={tipo === 'agenda-diaria'} onChange={(event) => alterarDataInicio(event.target.value)} />
           </label>
 
           <label className="field">
             <span>Data final</span>
-            <input type="date" value={dataFim} min={dataInicio || undefined} onChange={(event) => alterarDataFim(event.target.value)} />
+            <input type="date" value={dataFim} min={dataInicio || undefined} disabled={tipo === 'agenda-diaria'} onChange={(event) => alterarDataFim(event.target.value)} />
           </label>
 
           <div className="reports-filter-actions">
@@ -340,7 +340,7 @@ export function RelatoriosPage() {
         <section className="content-card empty-state">
           <span><CalendarRange size={24} /></span>
           <h2>Nenhum registro encontrado</h2>
-          <p>Ajuste o tipo de relatório ou o período informado e gere novamente.</p>
+          <p>{tipo === 'agenda-diaria' ? 'Não há agendamentos cadastrados para hoje.' : 'Ajuste o tipo de relatório ou o período informado e gere novamente.'}</p>
         </section>
       ) : (
         <div className="reports-result">
