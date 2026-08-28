@@ -6,6 +6,34 @@ export interface HistoricoClinico {
   veterinarioResponsavel: string
 }
 
+export interface AtendimentoPorProfissional {
+  veterinarioCpf: string
+  profissional: string
+  ano: number
+  mes: number
+  quantidadeAtendimentos: number
+  faturamentoTotal: number
+}
+
+export interface HistoricoPorPaciente {
+  idConsulta: number
+  idAnimal: number
+  paciente: string
+  especie: string
+  raca: string | null
+  sexo: string
+  peso: number | null
+  dataNascimento: string | null
+  tutorCpf: string | null
+  tutor: string | null
+  veterinarioCpf: string
+  veterinario: string
+  dataConsulta: string
+  status: string
+  observacoes: string | null
+  diagnostico: string | null
+}
+
 export interface InternacaoAtiva {
   leito: string
   paciente: string
@@ -20,3 +48,5 @@ export interface AgendaDiaria {
   paciente: string
   tutor: string
 }
+
+export type TipoRelatorio = 'atendimentos' | 'historico'
